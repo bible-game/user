@@ -1,0 +1,17 @@
+cors:
+  originPatterns: "http://localhost:3000,http://localhost:4200"
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bible-db
+    username: admin
+    password: root
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: update # update # create
+
+application:
+  config:
+    dir: ${BLE_CONFIG:/etc/secrets}

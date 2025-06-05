@@ -1,0 +1,14 @@
+cors:
+  originPatterns: "https://dev.bible.game,https://bible-game.github.io,http://localhost:3000"
+  # http://localhost:3000 for Stanley
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: none
