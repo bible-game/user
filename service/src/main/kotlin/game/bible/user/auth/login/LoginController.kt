@@ -1,6 +1,8 @@
-package game.bible.user.auth.registration
+package game.bible.user.auth.login
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -10,20 +12,22 @@ import org.springframework.web.bind.annotation.RestController
 private val log = KotlinLogging.logger {}
 
 /**
- * Exposes Registration-related Actions
+ * Exposes Login-related Actions
  * @since 5th June 2025
  */
 @RestController
-@RequestMapping("/auth/register")
-class RegistrationController(private val service: RegistrationService) {
+@RequestMapping("/auth/login")
+class LoginController(private val service: LoginService) {
 
-    /** Registers a new user */
+    /** Logs in and retrieves an authentication token */
     @PostMapping
-    fun register(@RequestBody data: RegistrationData): ResponseEntity<Any> {
+    fun login(req: HttpServletRequest,
+              res: HttpServletResponse,
+              @RequestBody data: LoginData): ResponseEntity<Any> {
         return try {
-            log.info { "Registration request received [${data.email}]" }
+            log.info { "Login request received [${data.email}]" }
 
-            val response = service.register(data)
+            val response = service.login(req, res, data)
             ResponseEntity.ok(response)
 
         } catch (e: Exception) {

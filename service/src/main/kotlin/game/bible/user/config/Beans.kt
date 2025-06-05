@@ -1,8 +1,10 @@
 package game.bible.user.config
 
+import game.bible.common.util.security.TokenManager
 import game.bible.user.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -10,12 +12,17 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import game.bible.config.ReloadableConfig
+import game.bible.config.model.core.SecurityConfig
 
 /**
  * Bean Configuration
  * @since 5th June 2025
  */
 @Configuration
+@Import(
+    ReloadableConfig::class,
+    SecurityConfig::class)
 class Beans {
 
     @Bean
@@ -36,5 +43,8 @@ class Beans {
 
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
+
+    @Bean
+    fun tokenManager(securityConfig: SecurityConfig): TokenManager = TokenManager(securityConfig)
 
 }

@@ -25,6 +25,7 @@ class Security(
                 it
                     .requestMatchers(HttpMethod.GET, "/health").permitAll()
                     .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
             }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
