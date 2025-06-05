@@ -1,7 +1,9 @@
 package game.bible.user.game
 
 import game.bible.common.model.BaseEntity
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 
 /**
@@ -12,5 +14,8 @@ import jakarta.persistence.Table
 @Table(name = "game")
 class Game (
     val passageId: Long = 0,
-    val guesses: List<Guess> = emptyList(),
+
+    @OneToMany(cascade = [CascadeType.ALL])
+    val guesses: List<Guess> = emptyList()
+
 ) : BaseEntity()
