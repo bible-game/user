@@ -2,7 +2,7 @@ cors:
   originPatterns: "http://localhost:3000,http://localhost:4200"
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/bible-db
+    url: jdbc:postgresql://localhost:5432/bible_db
     username: admin
     password: root
     driverClassName: org.postgresql.Driver
@@ -14,4 +14,4 @@ spring:
 
 application:
   config:
-    dir: ${BLE_CONFIG:/etc/secrets}
+    dir: ${BLE_CONFIG}
