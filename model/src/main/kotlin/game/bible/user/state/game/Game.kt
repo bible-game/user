@@ -1,8 +1,12 @@
-package game.bible.user.game
+package game.bible.user.state.game
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import game.bible.common.model.BaseEntity
+import game.bible.user.User
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 
@@ -18,6 +22,11 @@ class Game (
     val stars: Int = 0,
 
     @OneToMany(cascade = [CascadeType.ALL])
-    val guesses: List<Guess> = emptyList()
+    val guesses: List<Guess> = emptyList(),
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonBackReference("app_user_games")
+    val user: User = User()
 
 ) : BaseEntity()

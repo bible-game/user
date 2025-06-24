@@ -1,4 +1,4 @@
-package game.bible.user.game
+package game.bible.user.state.game
 
 import game.bible.common.model.BaseEntity
 import jakarta.persistence.Entity
