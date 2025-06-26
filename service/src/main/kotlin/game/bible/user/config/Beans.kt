@@ -1,5 +1,7 @@
 package game.bible.user.config
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import game.bible.common.util.security.TokenFilter
 import game.bible.common.util.security.TokenManager
 import game.bible.user.UserRepository
 import org.springframework.context.annotation.Bean
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import game.bible.config.ReloadableConfig
 import game.bible.config.model.core.SecurityConfig
+import jakarta.servlet.http.HttpServletRequest
 
 /**
  * Bean Configuration
@@ -45,6 +48,15 @@ class Beans {
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
-    fun tokenManager(securityConfig: SecurityConfig): TokenManager = TokenManager(securityConfig)
+    fun tokenManager(
+        config: SecurityConfig,
+        mapper: ObjectMapper,
+        request: HttpServletRequest
+    ): TokenManager = TokenManager(config, mapper, request)
+
+    @Bean
+    fun tokenFilter(manager: TokenManager): TokenFilter =
+        TokenFilter(manager).excludes(listOf("/auth", "/health"))
+
 
 }
