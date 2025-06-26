@@ -2,6 +2,7 @@ package game.bible.user.state.game
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
+import java.util.Optional
 
 /**
  * User Data Access
@@ -11,5 +12,7 @@ import org.springframework.stereotype.Repository
 interface GameRepository : JpaRepository<Game, Long> {
 
     fun findAllByUserId(userId: Long): List<Game>
+
+    fun findByPassageIdAndUserId(passageId: Long, userId: Long): Optional<Game>
 
 }

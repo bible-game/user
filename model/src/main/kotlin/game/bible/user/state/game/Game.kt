@@ -22,7 +22,7 @@ class Game (
     val stars: Int = 0,
 
     @OneToMany(cascade = [CascadeType.ALL])
-    val guesses: List<Guess> = emptyList(),
+    val guesses: MutableList<Guess> = mutableListOf(),
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
