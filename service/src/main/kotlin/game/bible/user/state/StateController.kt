@@ -40,20 +40,58 @@ class StateController(
         }
     }
 
+    /** Returns a user's read state */
+    @GetMapping("/read")
+    fun getReadState(auth: Authentication): ResponseEntity<Any> {
+        return try {
+            val userId = (auth.principal as String).toLongOrNull()
+                ?: throw Exception()
+
+            log.info { "Read state request received for user with id [$userId]" }
+
+            val state = service.retrieveReadState(userId)
+            ResponseEntity.status(200).body(state)
+
+        } catch (e: Exception) {
+            log.error { e.message } // TODO :: implement proper err handle
+            ResponseEntity.ok("Some error!")
+        }
+    }
+
     /** Registers a user's guess */
     @PostMapping("/guess/{passageId}")
     fun registerGuess(
         auth: Authentication,
         @PathVariable passageId: Long,
-        @RequestBody guess: GuessData): ResponseEntity<Any> {
+        @RequestBody data: GuessData): ResponseEntity<Any> {
         return try {
             val userId = (auth.principal as String).toLongOrNull()
                 ?: throw Exception()
 
             log.info { "Incoming guess from user with id  [$userId]" }
 
-            val guesses = service.createGuess(userId, passageId, guess)
+            val guesses = service.createGuess(userId, passageId, data)
             ResponseEntity.status(200).body(guesses)
+
+        } catch (e: Exception) {
+            log.error { e.message } // TODO :: implement proper err handle
+            ResponseEntity.ok("Some error!")
+        }
+    }
+
+    /** Registers a user's ticked read */
+    @PostMapping("/read")
+    fun registerRead(
+        auth: Authentication,
+        @RequestBody data: ReadData): ResponseEntity<Any> {
+        return try {
+            val userId = (auth.principal as String).toLongOrNull()
+                ?: throw Exception()
+
+            log.info { "Incoming read from user with id  [$userId]" }
+
+            val reads = service.createRead(userId, data)
+            ResponseEntity.status(200).body(reads)
 
         } catch (e: Exception) {
             log.error { e.message } // TODO :: implement proper err handle

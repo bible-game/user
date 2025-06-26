@@ -18,8 +18,8 @@ import jakarta.persistence.Table
 @Table(name = "game")
 class Game (
     val passageId: Long = 0,
-    val playing: Boolean = true,
-    val stars: Int = 0,
+    var playing: Boolean = true,
+    var stars: Int = 0,
 
     @OneToMany(cascade = [CascadeType.ALL])
     val guesses: MutableList<Guess> = mutableListOf(),
