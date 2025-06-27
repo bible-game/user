@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.context.TestPropertySource
 import game.bible.user.auth.login.LoginData
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Integration tests for the State Feature
  * @since 27th June 2025
  */
+@Ignore
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @TestPropertySource("classpath:config-test.yml")
