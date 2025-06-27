@@ -23,6 +23,7 @@ trait LoginTrait {
     /** Return sample user data */
     User getUser() {
         def user = new User(email, password)
+        // def user = new User(email, password, [new Game()], [new Read()])
 
         return user
     }
