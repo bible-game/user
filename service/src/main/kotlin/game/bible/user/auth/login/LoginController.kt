@@ -21,19 +21,16 @@ class LoginController(private val service: LoginService) {
 
     /** Logs in and retrieves an authentication token */
     @PostMapping
-    fun login(req: HttpServletRequest,
-              res: HttpServletResponse,
-              @RequestBody data: LoginData): ResponseEntity<Any> {
-        return try {
-            log.info { "Login request received [${data.email}]" }
+    fun login(
+        req: HttpServletRequest,
+        res: HttpServletResponse,
+        @RequestBody data: LoginData): ResponseEntity<Any>
+    {
+        log.info { "Login request received [${data.email}]" }
 
-            val response = service.login(req, res, data)
-            ResponseEntity.ok(response)
+        val response = service.login(req, res, data)
+        return ResponseEntity.ok(response)
 
-        } catch (e: Exception) {
-            log.error { e.message } // TODO :: implement proper err handle
-            ResponseEntity.ok("Some error!")
-        }
     }
 }
 
