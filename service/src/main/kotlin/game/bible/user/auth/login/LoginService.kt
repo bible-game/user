@@ -8,6 +8,7 @@ import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.InsufficientAuthenticationException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
@@ -51,7 +52,7 @@ class LoginService(
             return token
 
         } else {
-            throw Exception("User could not be authenticated! [$email]")
+            throw InsufficientAuthenticationException("User could not be authenticated! [$email]")
         }
     }
 

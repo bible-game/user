@@ -1,6 +1,8 @@
 package game.bible.user.auth.login
 
 import game.bible.user.User
+import game.bible.user.state.game.Game
+import game.bible.user.state.read.Read
 import spock.lang.Shared
 
 trait LoginTrait {
@@ -22,7 +24,7 @@ trait LoginTrait {
 
     /** Return sample user data */
     User getUser() {
-        def user = new User(email, password)
+         def user = new User(email, password, [new Game()], [new Read()])
 
         return user
     }
