@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository
 import java.util.Optional
 
 /**
- * User Data Access
+ * Game Data Access
  * @since 5th June 2024
  */
 @Repository

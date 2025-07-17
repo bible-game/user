@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference
 import game.bible.common.model.BaseEntity
 import game.bible.user.state.game.Game
 import game.bible.user.state.read.Read
+import game.bible.user.state.review.Review
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType.EAGER
@@ -19,13 +20,19 @@ import jakarta.persistence.Table
 data class User(
     val email: String = "",
     val password: String = "",
+    val firstname: String = "",
+    val lastname: String = "",
+    val church: String = "",
 
     // State
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = EAGER)
-    @JsonManagedReference("app_user_games")
-    val games: List<Game> = emptyList(),
+    @JsonManagedReference("app_user_game")
+    val games: MutableList<Game> = mutableListOf(),
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = EAGER)
-    @JsonManagedReference("app_user_reads")
-    val reads: List<Read> = emptyList()
+    @JsonManagedReference("app_user_read")
+    val reads: MutableList<Read> = mutableListOf(),
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = EAGER)
+    @JsonManagedReference("app_user_review")
+    val reviews: MutableList<Review> = mutableListOf()
 
 ) : BaseEntity()

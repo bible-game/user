@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 /**
- * User Data Access
+ * Read Data Access
  * @since 5th June 2024
  */
 @Repository

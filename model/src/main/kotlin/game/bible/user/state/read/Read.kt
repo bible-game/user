@@ -8,18 +8,25 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 
+import game.bible.user.state.ReadData
+
 /**
  * Ticked Read Model
  * @since 5th June 2025
  */
 @Entity
 @Table(name = "read")
-class Read (
+class Read(
     val passageKey: String = "",
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @JsonBackReference("app_user_reads")
-    val user: User = User()
+    @JsonBackReference("app_user_read")
+    var user: User? = null
 
-) : BaseEntity()
+) : BaseEntity() {
+    constructor(data: ReadData, user: User) : this(
+        data.passageKey,
+        user
+    )
+}
