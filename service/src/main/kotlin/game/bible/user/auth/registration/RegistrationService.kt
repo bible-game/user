@@ -3,7 +3,9 @@ package game.bible.user.auth.registration
 import game.bible.user.User
 import game.bible.user.UserRepository
 import game.bible.user.state.game.Game
+import game.bible.user.state.game.Guess
 import game.bible.user.state.read.Read
+import game.bible.user.state.review.GradingResult
 import game.bible.user.state.review.Review
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
@@ -32,23 +34,21 @@ class RegistrationService(
         }
 
         val password = passwordEncoder.encode(data.password)
-        val user = createUser(email, password, data)
-        log.debug { "User registered successfully" }
-
-        return user
+        return createUser(email, password, data)
     }
 
     /** Determines if a user exists with a given email */
     @Transactional(readOnly = true)
     fun isExisting(email: String): Boolean {
-        log.debug { "Checking if user with email already exists [$email]" }
+        log.info { "Checking if user with email already exists [$email]" }
         return repository.findByEmail(email).isPresent
     }
 
     /** Creates a user */
-    private fun createUser(
+    @Transactional
+    fun createUser(
         email: String, password: String, data: RegistrationData): User {
-        log.debug { "Transferring browser state to persistent storage" }
+        log.info { "Transferring browser state to persistent storage" }
 
         val user = User(
             email,
@@ -57,9 +57,9 @@ class RegistrationService(
             data.lastname,
             data.church
         )
-        user.games.addAll(data.games.map { Game(it, user) })
-        user.reads.addAll(data.reads.map { Read(it, user) })
-        user.reviews.addAll(data.reviews.map { Review(it, user) })
+        user.games.addAll(data.games.map { g -> Game(g.passageId, g.playing, g.stars, g.guesses.map { Guess(it.distance, it.percentage, it.book, it.chapter) } as MutableList, user) })
+        user.reads.addAll(data.reads.map { Read(it.passageKey, it.book, it.chapter, it.verseStart, it.verseEnd, user) })
+        user.reviews.addAll(data.reviews.map { Review(it.passageKey, it.date, it.stars, it.summary, it.answers, GradingResult(it.gradingResult.score, it.gradingResult.message), user) })
 
         return repository.save(user)
     }

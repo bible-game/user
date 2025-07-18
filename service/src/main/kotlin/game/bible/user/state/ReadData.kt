@@ -8,5 +8,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 class ReadData (
-    val passageKey: String
+    val passageKey: String,
+    val book: String,
+    val chapter: String,
+    val verseStart: String,
+    val verseEnd: String,
+
 )

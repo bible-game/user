@@ -20,7 +20,7 @@ class StateServiceSpec extends Specification implements StateTrait {
     def userRepo = Mock(UserRepository)
 
     @Subject
-    def service = new StateService(gameRepo, readRepo, userRepo)
+    def service = new StateService(gameRepo, readRepo, userRepo, reviewRepository)
 
     def "should retrieve game state"() {
         given:

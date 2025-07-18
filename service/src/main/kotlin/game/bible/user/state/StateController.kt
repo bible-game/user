@@ -58,6 +58,24 @@ class StateController(
         }
     }
 
+    /** Returns a user's review state */
+    @GetMapping("/review")
+    fun getReviewState(auth: Authentication): ResponseEntity<Any> {
+        return try {
+            val userId = (auth.principal as String).toLongOrNull()
+                ?: throw Exception()
+
+            log.info { "Review state request received for user with id [$userId]" }
+
+            val state = service.retrieveReviewState(userId)
+            ResponseEntity.status(200).body(state)
+
+        } catch (e: Exception) {
+            log.error { e.message } // TODO :: implement proper err handle
+            ResponseEntity.ok("Some error!")
+        }
+    }
+
     /** Registers a user's guess */
     @PostMapping("/guess/{passageId}")
     fun registerGuess(
@@ -91,6 +109,26 @@ class StateController(
             log.info { "Incoming read from user with id  [$userId]" }
 
             val reads = service.createRead(userId, data)
+            ResponseEntity.status(200).body(reads)
+
+        } catch (e: Exception) {
+            log.error { e.message } // TODO :: implement proper err handle
+            ResponseEntity.ok("Some error!")
+        }
+    }
+
+    /** Registers a user's review */
+    @PostMapping("/review")
+    fun registerReview(
+        auth: Authentication,
+        @RequestBody data: ReviewData): ResponseEntity<Any> {
+        return try {
+            val userId = (auth.principal as String).toLongOrNull()
+                ?: throw Exception()
+
+            log.info { "Incoming review from user with id  [$userId]" }
+
+            val reads = service.createReview(userId, data)
             ResponseEntity.status(200).body(reads)
 
         } catch (e: Exception) {

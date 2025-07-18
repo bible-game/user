@@ -12,5 +12,6 @@ class ReviewData (
     val date: String,
     val stars: Int,
     val summary: String,
-    val answers: List<String>
+    val answers: List<String>,
+    val gradingResult: GradingResultData
 )

@@ -1,7 +1,6 @@
 package game.bible.user.state.game
 
 import game.bible.common.model.BaseEntity
-import game.bible.user.state.GuessData
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
 
@@ -17,11 +16,4 @@ class Guess(
     var book: String = "",
     var chapter: String = ""
 
-) : BaseEntity() {
-    constructor(data: GuessData) : this(
-        data.distance,
-        data.percentage,
-        data.book,
-        data.chapter
-    )
-}
+) : BaseEntity()

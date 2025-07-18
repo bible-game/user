@@ -10,8 +10,6 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 
-import game.bible.user.state.GameData
-
 /**
  * Played Game Model
  * @since 5th June 2025
@@ -31,12 +29,4 @@ class Game(
     @JsonBackReference("app_user_game")
     var user: User? = null
 
-) : BaseEntity() {
-    constructor(data: GameData, user: User) : this(
-        data.passageId,
-        data.playing,
-        data.stars,
-        data.guesses.map { Guess(it) }.toMutableList(),
-        user
-    )
-}
+) : BaseEntity()

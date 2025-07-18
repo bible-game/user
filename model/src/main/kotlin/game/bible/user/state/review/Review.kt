@@ -3,16 +3,16 @@ package game.bible.user.state.review
 import com.fasterxml.jackson.annotation.JsonBackReference
 import game.bible.common.model.BaseEntity
 import game.bible.user.User
+import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
 import jakarta.persistence.FetchType.EAGER
+import jakarta.persistence.FetchType.LAZY
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-
-import game.bible.user.state.ReviewData
 
 /**
  * Review Model
@@ -30,18 +30,13 @@ class Review(
     @CollectionTable(name = "answer", joinColumns = [JoinColumn(name = "review_id")])
     val answers: List<String> = mutableListOf(),
 
+    @OneToOne(cascade = [ALL], orphanRemoval = true, fetch = LAZY)
+    @JoinColumn(name = "grade_id", referencedColumnName = "id")
+    val gradingResult: GradingResult = GradingResult(0, ""),
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonBackReference("app_user_review")
     var user: User? = null
 
-) : BaseEntity() {
-    constructor(data: ReviewData, user: User) : this(
-        data.passageKey,
-        data.date,
-        data.stars,
-        data.summary,
-        data.answers,
-        user
-    )
-}
+) : BaseEntity()
