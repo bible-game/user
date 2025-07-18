@@ -1,5 +1,8 @@
 package game.bible.user.state
 
+import game.bible.user.state.data.GuessData
+import game.bible.user.state.data.ReadData
+import game.bible.user.state.data.ReviewData
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -81,7 +84,8 @@ class StateController(
     fun registerGuess(
         auth: Authentication,
         @PathVariable passageId: Long,
-        @RequestBody data: GuessData): ResponseEntity<Any> {
+        @RequestBody data: GuessData
+    ): ResponseEntity<Any> {
         return try {
             val userId = (auth.principal as String).toLongOrNull()
                 ?: throw Exception()
@@ -101,7 +105,8 @@ class StateController(
     @PostMapping("/read")
     fun registerRead(
         auth: Authentication,
-        @RequestBody data: ReadData): ResponseEntity<Any> {
+        @RequestBody data: ReadData
+    ): ResponseEntity<Any> {
         return try {
             val userId = (auth.principal as String).toLongOrNull()
                 ?: throw Exception()
@@ -121,7 +126,8 @@ class StateController(
     @PostMapping("/review")
     fun registerReview(
         auth: Authentication,
-        @RequestBody data: ReviewData): ResponseEntity<Any> {
+        @RequestBody data: ReviewData
+    ): ResponseEntity<Any> {
         return try {
             val userId = (auth.principal as String).toLongOrNull()
                 ?: throw Exception()

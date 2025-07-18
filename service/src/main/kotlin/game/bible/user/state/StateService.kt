@@ -1,6 +1,9 @@
 package game.bible.user.state
 
 import game.bible.user.UserRepository
+import game.bible.user.state.data.GuessData
+import game.bible.user.state.data.ReadData
+import game.bible.user.state.data.ReviewData
 import game.bible.user.state.game.Game
 import game.bible.user.state.game.GameRepository
 import game.bible.user.state.game.Guess
@@ -56,7 +59,7 @@ class StateService(
 
         if (game == null) {
             val user = userRepository.findById(userId).get()
-            game = Game(passageId, true, 0, mutableListOf(guess), user)
+            game = Game(passageId, data.passageBook, data.passageChapter,true, 0, mutableListOf(guess), user)
 
         } else if (!game.playing) {
             return game.guesses

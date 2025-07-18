@@ -18,6 +18,8 @@ import jakarta.persistence.Table
 @Table(name = "game")
 class Game(
     var passageId: Long = 0,
+    var passageBook: String = "",
+    var passageChapter: String = "",
     var playing: Boolean = true,
     var stars: Int = 0,
 

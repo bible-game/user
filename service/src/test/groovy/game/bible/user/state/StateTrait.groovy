@@ -2,6 +2,8 @@
 package game.bible.user.state
 
 import game.bible.user.User
+import game.bible.user.state.data.GuessData
+import game.bible.user.state.data.ReadData
 import game.bible.user.state.game.Game
 import game.bible.user.state.game.Guess
 import game.bible.user.state.read.Read

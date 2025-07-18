@@ -1,4 +1,4 @@
-package game.bible.user.state
+package game.bible.user.state.data
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 

@@ -57,7 +57,7 @@ class RegistrationService(
             data.lastname,
             data.church
         )
-        user.games.addAll(data.games.map { g -> Game(g.passageId, g.playing, g.stars, g.guesses.map { Guess(it.distance, it.percentage, it.book, it.chapter) } as MutableList, user) })
+        user.games.addAll(data.games.map { g -> Game(g.passageId, g.guesses.first().passageBook, g.guesses.first().passageChapter, g.playing, g.stars, g.guesses.map { Guess(it.distance, it.percentage, it.book, it.chapter) } as MutableList, user) })
         user.reads.addAll(data.reads.map { Read(it.passageKey, it.book, it.chapter, it.verseStart, it.verseEnd, user) })
         user.reviews.addAll(data.reviews.map { Review(it.passageKey, it.date, it.stars, it.summary, it.answers, GradingResult(it.gradingResult.score, it.gradingResult.message), user) })
 

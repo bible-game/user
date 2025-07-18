@@ -1,4 +1,4 @@
-package game.bible.user.state
+package game.bible.user.state.data
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
@@ -11,5 +11,7 @@ class GuessData (
     val book: String,
     val chapter: String,
     val distance: Int,
-    val percentage: Int
+    val percentage: Int,
+    val passageBook: String,
+    val passageChapter: String
 )

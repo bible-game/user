@@ -1,9 +1,9 @@
 package game.bible.user.auth.registration
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import game.bible.user.state.GameData
-import game.bible.user.state.ReadData
-import game.bible.user.state.ReviewData
+import game.bible.user.state.data.GameData
+import game.bible.user.state.data.ReadData
+import game.bible.user.state.data.ReviewData
 
 /**
  * Registration Request Data
