@@ -17,7 +17,7 @@ dependencyResolutionManagement {
         }
 
         create("libs") {
-            from("game.bible:version:0.1.0")
+            from("game.bible:version:0.5.0")
         }
     }
 }

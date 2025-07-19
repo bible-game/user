@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8082
 
 # todo :: move to application-test.yml
 #spring:
@@ -13,11 +13,12 @@ server:
 #  h2:
 #    console.enabled: true
 
-application:
-  config:
-    dir: "${CONFIGURATION:/etc/secrets/}"
-    # Improvement :: is there a better place on render to keep config?
 management:
   endpoints:
     web:
       base-path: /
+
+spring:
+  ai:
+    openai:
+      api-key: "${OPENAI_KEY}"
