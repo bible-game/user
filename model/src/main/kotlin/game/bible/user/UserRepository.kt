@@ -1,6 +1,8 @@
 package game.bible.user
 
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.util.Optional
 
@@ -12,5 +14,9 @@ import java.util.Optional
 interface UserRepository : JpaRepository<User, Long> {
 
     fun findByEmail(email: String): Optional<User>
+
+    @Modifying
+    @Query("UPDATE User u SET u.password = :password WHERE u.id = :id")
+    fun updatePassword(id: Long, password: String)
 
 }

@@ -27,6 +27,7 @@ class Security(
                 it
                     .requestMatchers(HttpMethod.GET, "/health").permitAll()
                     .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                    .requestMatchers(HttpMethod.PUT, "/auth/update-password").permitAll() // fixme!
                     .anyRequest().authenticated()
             }
 
