@@ -5,9 +5,9 @@ package game.bible.user.leader
  * @since 20th July 2025
  */
 data class LeaderResponse (
-    val id: Int,
+    val id: Long,
     val firstname: String,
     val lastname: String,
-    val gameStars: Int,
-    val reviewStars: Int
+    val gameStars: Long,
+    val reviewStars: Long
 )
