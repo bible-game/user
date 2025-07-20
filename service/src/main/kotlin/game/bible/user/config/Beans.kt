@@ -42,6 +42,6 @@ class Beans {
 
     @Bean
     fun tokenFilter(manager: TokenManager): TokenFilter =
-        TokenFilter(manager).excludes(listOf("/auth", "/health"))
+        TokenFilter(manager).excludes(listOf("/auth", "/health", "/leader"))
 
 }
