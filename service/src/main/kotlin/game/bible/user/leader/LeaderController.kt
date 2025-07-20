@@ -20,4 +20,10 @@ class LeaderController(private val service: LeaderService) {
         return ResponseEntity.ok(service.getLeaders(limit))
     }
 
+    /** Returns the player's rank */
+    @GetMapping("/rank")
+    fun getRank(@RequestParam userId: Long): ResponseEntity<Any> {
+        return ResponseEntity.ok(service.getRank(userId))
+    }
+
 }

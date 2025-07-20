@@ -23,4 +23,7 @@ interface UserRepository : JpaRepository<User, Long> {
     @Query("SELECT u.id, u.firstname, u.lastname, (SELECT COALESCE(sum(g.stars), 0) FROM Game g WHERE g.user.id = u.id), (SELECT COALESCE(SUM(r.stars), 0) FROM Review r WHERE r.user.id = u.id) FROM User u ORDER BY u.id DESC")
     fun getLeaders(pageable: Pageable): List<List<Any>>
 
+    @Query("SELECT u.id, (SELECT COALESCE(sum(g.stars), 0) FROM Game g WHERE g.user.id = u.id), (SELECT COALESCE(SUM(r.stars), 0) FROM Review r WHERE r.user.id = u.id) FROM User u")
+    fun getAllPlayers(): List<List<Any>>
+
 }
