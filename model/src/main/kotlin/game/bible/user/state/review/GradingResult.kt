@@ -1,13 +1,8 @@
 package game.bible.user.state.review
 
-import com.fasterxml.jackson.annotation.JsonBackReference
 import game.bible.common.model.BaseEntity
-import game.bible.user.User
-import jakarta.persistence.CollectionTable
-import jakarta.persistence.ElementCollection
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.FetchType.EAGER
-import jakarta.persistence.JoinColumn
 import jakarta.persistence.Table
 
 /**
@@ -18,6 +13,8 @@ import jakarta.persistence.Table
 @Table(name = "grading_result")
 class GradingResult(
     val score: Int = 0,
+
+    @Column(columnDefinition="TEXT")
     val message: String = "",
 
 ) : BaseEntity()

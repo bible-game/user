@@ -5,6 +5,7 @@ import game.bible.common.model.BaseEntity
 import game.bible.user.User
 import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.CollectionTable
+import jakarta.persistence.Column
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType.EAGER
@@ -24,6 +25,8 @@ class Review(
     val passageKey: String = "",
     val date: String = "",
     val stars: Int = 0,
+
+    @Column(columnDefinition="TEXT")
     val summary: String = "",
 
     @ElementCollection(targetClass = String::class, fetch = EAGER)
