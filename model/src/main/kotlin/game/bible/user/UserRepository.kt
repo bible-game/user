@@ -20,7 +20,7 @@ interface UserRepository : JpaRepository<User, Long> {
     @Query("UPDATE User u SET u.password = :password WHERE u.id = :id")
     fun updatePassword(id: Long, password: String)
 
-    @Query("SELECT u.id, u.firstname, u.lastname, (SELECT COALESCE(sum(g.stars), 0) FROM Game g WHERE g.user.id = u.id), (SELECT COALESCE(SUM(r.stars), 0) FROM Review r WHERE r.user.id = u.id) FROM User u ORDER BY u.id DESC")
+    @Query("SELECT u.id, u.firstname, u.lastname, (SELECT COALESCE(sum(g.stars), 0) FROM Game g WHERE g.user.id = u.id), (SELECT COALESCE(SUM(r.stars), 0) FROM Review r WHERE r.user.id = u.id) FROM User u ORDER BY ((SELECT COALESCE(sum(g.stars), 0) FROM Game g WHERE g.user.id = u.id) + (SELECT COALESCE(SUM(r.stars), 0) FROM Review r WHERE r.user.id = u.id)) DESC")
     fun getLeaders(pageable: Pageable): List<List<Any>>
 
     @Query("SELECT u.id, (SELECT COALESCE(sum(g.stars), 0) FROM Game g WHERE g.user.id = u.id), (SELECT COALESCE(SUM(r.stars), 0) FROM Review r WHERE r.user.id = u.id) FROM User u")
