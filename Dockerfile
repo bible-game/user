@@ -4,7 +4,7 @@ COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 ARG GITHUB_ACTOR
 ARG GITHUB_TOKEN
-RUN gradle build --no-daemon --stacktrace -x test
+RUN gradle build --no-daemon -x test
 
 # Package
 FROM openjdk:21-jdk
