@@ -26,7 +26,8 @@ class Security(
             .authorizeHttpRequests {
                 it
                     .requestMatchers(HttpMethod.GET, "/health").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                    .requestMatchers(HttpMethod.GET , "/auth/login/renew-token").permitAll()
+                    .requestMatchers(HttpMethod.POST , "/auth/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/leader/**").permitAll()
                     .requestMatchers(HttpMethod.PUT, "/auth/update-password").permitAll() // fixme!
                     .anyRequest().authenticated()

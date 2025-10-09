@@ -3,6 +3,7 @@ package game.bible.user.auth.login
 import game.bible.common.util.security.TokenManager
 import game.bible.config.model.core.SecurityConfig
 import game.bible.user.UserRepository
+import game.bible.user.auth.token.RefreshTokenService
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
@@ -25,12 +26,11 @@ class LoginService(
     private val repository: UserRepository,
     private val authManager: AuthenticationManager,
     private val tokenManager: TokenManager,
-    private val securityConfig: SecurityConfig
+    private val securityConfig: SecurityConfig,
+    private val refreshTokenService: RefreshTokenService,
 ) {
 
-    /** Authenticates a user based on given email and password */
-    fun login(
-        req: HttpServletRequest, res: HttpServletResponse, data: LoginData): String {
+    fun login(req: HttpServletRequest, res: HttpServletResponse, data: LoginData): Map<String, String> {
         val email = data.email // .normalise() -> TODO :: add to common utils (
 
         log.debug { "Attempting authentication for user [$email]" }
@@ -46,43 +46,28 @@ class LoginService(
         if (authentication.isAuthenticated) {
             clearSessionCookies(req, res)
 
-            val token: String = tokenManager.generateFor(user.id!!)
+            val token: String = tokenManager.generateFor(user.id!!.toString(), "auth")
             applyJWTCookie(req, res, token)
-
-            return token
+            val refreshToken = refreshTokenService.applyNewRefreshToken(req, res, user.id!!)
+            return mapOf(
+                "authToken" to token,
+                "refreshToken" to refreshToken
+            )
 
         } else {
             throw InsufficientAuthenticationException("User could not be authenticated! [$email]")
         }
     }
 
-    /** Clears session cookies from the response */
-    private fun clearSessionCookies(request: HttpServletRequest, response: HttpServletResponse) {
-        val cookies = request.cookies
-        if (cookies != null) {
-            log.debug { "Found [${cookies.size}] cookies ..." }
-
-            for (cookie in cookies) {
-                if (cookie.name.endsWith(securityConfig.getJwt()!!.getCookieName() as String, false)) {
-                    log.debug("... Clearing cookie [{}] ...", cookie.name)
-                    cookie.value = null
-                    cookie.domain = securityConfig.getJwt()!!.getCookieDomain()!!
-                    cookie.maxAge = 0 // Don't set to -1, or it will become a session cookie!
-                    response.addCookie(cookie)
-                }
-            }
-        }
-    }
-
-    /** Adds a JWT as a cookie to the response */
     fun applyJWTCookie(request: HttpServletRequest, response: HttpServletResponse, token: String) {
-        val cookieName = securityConfig.getJwt()!!.getCookieName()!!
-        val timeout = securityConfig.getJwt()!!.getSessionTimeoutMins()!! * 60
+        val authConfig = securityConfig.getJwts()!!["auth"]!!
+        val cookieName = authConfig.getCookieName()
+        val timeout = authConfig.getTimeoutMins()!! * 60
         val origin = request.getHeader("origin")
         val cookieDomain = if (origin != null && origin.contains("localhost")) {
             "localhost"
         } else {
-            securityConfig.getJwt()!!.getCookieDomain()!!
+            securityConfig.getDomainName()!!
         }
 
         clearSessionCookies(request, response)
@@ -98,6 +83,24 @@ class LoginService(
 
         log.debug { "Adding cookie [$cookieName] to domain [$cookieDomain]" }
         response.addCookie(cookie)
+    }
+
+    private fun clearSessionCookies(request: HttpServletRequest, response: HttpServletResponse) {
+        val authConfig = securityConfig.getJwts()!!["auth"]!!
+        val cookies = request.cookies
+        if (cookies != null) {
+            log.debug { "Found [${cookies.size}] cookies ..." }
+
+            for (cookie in cookies) {
+                if (cookie.name.endsWith(authConfig.getCookieName() as String, false)) {
+                    log.debug { "... Clearing cookie [${cookie.name}] ..." }
+                    cookie.value = null
+                    cookie.domain = securityConfig.getDomainName()!!
+                    cookie.maxAge = 0 // Don't set to -1, or it will become a session cookie!
+                    response.addCookie(cookie)
+                }
+            }
+        }
     }
 
 }
