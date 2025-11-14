@@ -1,3 +1,7 @@
+application:
+  config:
+    dir: "${CONFIGURATION:/etc/secrets/}"
+
 server:
   port: 8082
 
@@ -17,8 +21,3 @@ management:
   endpoints:
     web:
       base-path: /
-
-spring:
-  ai:
-    openai:
-      api-key: "${OPENAI_KEY}"
