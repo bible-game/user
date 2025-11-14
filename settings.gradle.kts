@@ -10,8 +10,8 @@ dependencyResolutionManagement {
                 name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/bible-game/version")
                 credentials {
-                    username = System.getenv("GH_PACKAGES_USER")
-                    password = System.getenv("GH_PACKAGES_TOKEN")
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
                 }
             }
         }
