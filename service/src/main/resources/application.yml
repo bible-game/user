@@ -21,3 +21,7 @@ management:
   endpoints:
     web:
       base-path: /
+spring:
+  ai:
+    openai:
+      api-key: "${OPENAI_KEY}"
