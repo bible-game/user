@@ -1,6 +1,5 @@
 cors:
-  originPatterns: "https://dev.bible.game,https://bible-game.github.io,http://localhost:3000,https://admin.bible.game"
-  # http://localhost:3000 for Stanley
+  originPatterns: "https://bible.game,https://admin.bible.game"
 spring:
   datasource:
     url: jdbc:postgresql://${POSTGRES_URL}
