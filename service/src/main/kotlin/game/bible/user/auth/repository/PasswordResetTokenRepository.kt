@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository
 interface PasswordResetTokenRepository: JpaRepository<PasswordResetToken, String> {
 
     @Query("""
-       SELECT PasswordResetToken prt
-       FROM PasswordResetToken 
+       SELECT prt
+       FROM PasswordResetToken prt
        WHERE prt.state = 'ACTIVE' AND prt.user.id = :userId
     """)
     fun getActiveTokensForUser(userId: Long): List<PasswordResetToken>

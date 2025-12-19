@@ -1,6 +1,7 @@
 package game.bible.user.auth
 
 import game.bible.user.info.InfoService
+import game.bible.user.notification.NotificationService
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
     private val authService: AuthService,
     private val userInfoService: InfoService,
-//    private val notificationService: NotificationService // TODO
+    private val notificationService: NotificationService,
 ) {
 
     @PutMapping("/update-password")
@@ -41,11 +42,17 @@ class AuthController(
 
         } else {
             val token = authService.createPasswordResetToken(user)
+            return try {
+                notificationService.sendResetRequest(email, token)
+                ResponseEntity.ok().build()
+            } catch (e: Exception) {
+                log.error("Error occurred when sending reset request email!", e)
+                ResponseEntity.internalServerError().body("An unexpected error occurred. Please review the service logs.")
+            }
             // TODO:
             //  - Generate password reset token, store in DB
             //  - Use email service to send password reset request, including token as query param
             //  - Implement 2FA step (confirm email or enter provided code)
-            return ResponseEntity.ok().build()
         }
     }
 

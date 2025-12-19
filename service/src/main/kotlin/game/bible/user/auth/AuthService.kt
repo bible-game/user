@@ -4,13 +4,13 @@ import game.bible.config.model.core.SecurityConfig
 import game.bible.user.User
 import game.bible.user.UserRepository
 import game.bible.user.auth.model.PasswordResetToken
+import game.bible.user.auth.model.PasswordResetToken.ResetTokenState
 import game.bible.user.auth.repository.PasswordResetTokenRepository
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 import kotlin.jvm.optionals.getOrElse
 
 /**
@@ -22,16 +22,28 @@ class AuthService(
     private val encoder: PasswordEncoder,
     private val userRepo: UserRepository,
     private val resetTokenRepo: PasswordResetTokenRepository,
-    private val securityConfig: SecurityConfig
+    private val securityConfig: SecurityConfig,
 ) {
 
     @Transactional
     fun updatePassword(data: PasswordResetData) {
-        val resetToken = resetTokenRepo.findById(data.resetToken).getOrElse { throw IllegalStateException("Token [${data.resetToken}] does not exist") }
+        val resetToken = resetTokenRepo.findById(data.resetToken).let {
+            val token = it.getOrElse { throw IllegalStateException("Token [${data.resetToken}] does not exist") }
+            if (token.state !== ResetTokenState.ACTIVE) {
+                throw IllegalStateException("Token [${data.resetToken}] has expired")
+            }
+            token
+        }
         log.debug("Handling password reset request for User ID: [{}]", resetToken.user.id!!)
 
-        val newPasswordHash = encoder.encode(data.password)
-        userRepo.updatePassword(resetToken.user.id!!, newPasswordHash)
+        try {
+            userRepo.updatePassword(resetToken.user.id!!, data.password)
+            resetToken.state = ResetTokenState.USED
+            resetTokenRepo.save(resetToken)
+        } catch (e: Exception) {
+            log.error("Error thrown when attempting password reset for User ID: [{}]", resetToken.user.id!!, e)
+            throw e
+        }
     }
 
     /**
@@ -61,7 +73,7 @@ class AuthService(
 
         val newToken = PasswordResetToken(
             user = user,
-            expiresAt = currentTime.plus(resetConfig.getExpireInMins()!!, ChronoUnit.MINUTES),
+            expiresAt = currentTime.plusMinutes(resetConfig.getExpireInMins()!!),
         )
         if (existingToken != null) {
             log.info("Replacing Password Reset Token [{}] with new token [{}] for User ID [{}]", existingToken.token, existingToken.token, user.id)

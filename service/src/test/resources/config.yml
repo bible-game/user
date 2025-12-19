@@ -1,0 +1,85 @@
+#########################################################################
+# Integration Configuration :: AWS
+#########################################################################
+aws:
+  base-url: https://s2.us-fake-1.localhost
+  username: JeffBezos
+  password: password
+  config:
+    host: s2.us-fake-1.localhost
+    region: us-east-1
+  connection:
+    read-timeout: 100000
+    retry-count: 5
+    retry-interval: 1000
+    timeout: 50000
+  s3:
+    audio-bucket: bible-game-audio
+
+#########################################################################
+# Integration Configuration :: Bible-Api
+#########################################################################
+bible-api:
+  base-url: https://bible-api.com
+  api:
+    fetch: /
+
+#########################################################################
+# Integration Configuration :: ChatGPT (OpenAI)
+#########################################################################
+chat-gpt:
+  api-key: sk-svcacct-imafraidicantdothatdave
+  pre-context:
+    prompt-developer: 'The user is about to read this biblical passage and wants to understand how it fits into the Bible'
+    prompt-user: 'Please provide a short context (around 100 words) about the book and events leading up the passage: '
+  post-context:
+    prompt-developer: 'The user has just read the text so please leave out events that happen before or during this passage'
+    prompt-user: 'Please provide a short context (around 100 words) about the events strictly after the passage: '
+  daily:
+    prompt-developer: 'The sentence is a hint for a bible guessing game, so please avoid the name of the book that it belongs to and leave off the full stop at the end'
+    prompt-user: 'Please summarise this biblical chapter in one sentence that is 4 to 7 words long: '
+  study:
+    prompt-developer: 'Questions should be challenging and require you to have read the chapter thoroughly; please respond in this JSON format: [{content: "", optionOne: "", optionTwo: "", optionThree: "", correct: ""}]; where "correct" is the answer value of the correct option.'
+    prompt-user: 'Hello! Please could you give me four multiple-choice questions (each with 3 choices) about the following biblical chapter: '
+  golden:
+    prompt-developer: 'This response is a golden summary that we will compare other summaries to; so please avoid interpretation, just consider the core message and structure.'
+    prompt-user: 'Hello! Please summarise this Biblical chapter in 2–4 sentences: '
+  feedback:
+    prompt-developer: |
+      The user has read an AI-generated summary and has provided feedback on how the summary can be improved.
+      Based on the user's feedback, and the current prompt, suggest a new prompt that can be used to generate a new summary that incorporates the feedback.
+      Do not include any commentary, just provide the new prompt.
+      This is the user's feedback:
+    prompt-user: 'Please refine this prompt based on the feedback provided by the user: '
+
+#########################################################################
+# Service Configuration :: Passage
+#########################################################################
+passage-service:
+  min-verses: 2
+  max-verses: 4
+
+#########################################################################
+# Service Configuration :: User
+#########################################################################
+user-service:
+  comms:
+    # MailJet
+    send-address: hello@bible.game
+    api-key: thisisanapikey
+    secret-key: thisisasecretkey
+
+#########################################################################
+# Security Configuration
+#########################################################################
+security:
+  cors-allowed-host:
+    - '*'
+  password-reset:
+    expire-in-mins: 30
+  jwt:
+    session-timeout-mins: 14400000
+    signing-secret: 'ohsosecret'
+    auth-token-header: SESSION_ID
+    cookie-domain: dev.bible.game
+    cookie-name: SESSION_ID

@@ -50,7 +50,9 @@ subprojects {
         implementation(rootProject.libs.bundles.kotlin)
         implementation(rootProject.libs.bundles.spring)
         implementation(rootProject.libs.bundles.security)
-        implementation(rootProject.libs.bundles.test)
+        implementation("com.mailjet:mailjet-client:6.0.0")
+
+        testImplementation(rootProject.libs.bundles.test)
     }
 }
 
