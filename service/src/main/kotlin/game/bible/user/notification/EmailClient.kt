@@ -19,6 +19,7 @@ class EmailClient {
         val options = ClientOptions.builder()
             .apiKey(comms!!.getApiKey())
             .apiSecretKey(comms.getSecretKey())
+            .baseUrl(comms.getBaseUrl())
             .build()
 
         this.client = MailjetClient(options)
@@ -32,7 +33,7 @@ class EmailClient {
             .htmlPart("""
                 <h1>You have requested a reset of your password for bible.game</h1>
                 <p>If this wasn't you, feel free to ignore.</p>
-                <p>If this was you, please follow this link: https://bible.game?reset=${resetToken}</p>
+                <p>If this was you, please follow this link: https://bible.game/reset?token=${resetToken}</p>
             """.trimIndent())
             .build()
 
