@@ -65,6 +65,7 @@ passage-service:
 user-service:
   comms:
     # MailJet
+    base-url: http://localhost:56556
     send-address: hello@bible.game
     api-key: thisisanapikey
     secret-key: thisisasecretkey

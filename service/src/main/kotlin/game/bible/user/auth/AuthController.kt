@@ -26,10 +26,26 @@ class AuthController(
     @PutMapping("/update-password")
     fun updatePassword(@RequestBody data: PasswordResetData): ResponseEntity<Any> {
         log.info("Update password request received with token [{}]", data.resetToken)
-        authService.updatePassword(data)
+        return try {
+            authService.updatePassword(data)
+            ResponseEntity.ok().build()
+        } catch (isE: IllegalStateException) {
+            ResponseEntity.badRequest().body(
+                mapOf(
+                    "type" to "CLIENT_ERROR",
+                    "message" to isE.message,
+                )
+            )
+        } catch (e: Exception) {
+            log.error("Error while updating password", e)
+            ResponseEntity.internalServerError().body(
+                mapOf(
+                    "type" to "INTERNAL_SERVER_ERROR",
+                    "message" to "Internal Server Error. Please check the logs for detail."
+                )
+            )
+        }
         // FixMe :: proper security around who is changing who's password!! (get user from token?!)
-
-        return ResponseEntity.ok().build()
     }
 
     @PostMapping("/request-password-reset")
@@ -49,10 +65,6 @@ class AuthController(
                 log.error("Error occurred when sending reset request email!", e)
                 ResponseEntity.internalServerError().body("An unexpected error occurred. Please review the service logs.")
             }
-            // TODO:
-            //  - Generate password reset token, store in DB
-            //  - Use email service to send password reset request, including token as query param
-            //  - Implement 2FA step (confirm email or enter provided code)
         }
     }
 
