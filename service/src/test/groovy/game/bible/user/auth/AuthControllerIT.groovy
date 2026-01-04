@@ -31,8 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-
-@DirtiesContext
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AuthControllerIT extends Specification {
@@ -50,7 +48,6 @@ class AuthControllerIT extends Specification {
 
     User user
 
-    @Transactional
     def setup() {
         user = userRepo.save(
             new User(
@@ -63,6 +60,11 @@ class AuthControllerIT extends Specification {
             )
         )
         entityManager = emFactory.createEntityManager()
+    }
+
+    def cleanup() {
+        resetTokenRepo.deleteAll()
+        userRepo.deleteAll()
     }
 
     def setupSpec() {
@@ -162,8 +164,9 @@ class AuthControllerIT extends Specification {
         tx.begin()
         // Requires User obj from current Transaction - don't know why
         def txUser = entityManager
-            .createQuery("SELECT user FROM User user WHERE user.id = 1", User.class)
-            .getSingleResult()
+            .createQuery("SELECT user FROM User user", User.class)
+            .getResultList()
+            .getFirst()
 
         def resetToken = new PasswordResetToken(
             null, txUser, ResetTokenState.ACTIVE, now, now.plusMinutes(30L)

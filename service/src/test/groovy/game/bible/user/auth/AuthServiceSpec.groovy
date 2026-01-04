@@ -23,7 +23,6 @@ import static game.bible.user.auth.model.PasswordResetToken.ResetTokenState
  *
  * @author Hayden Eastwell (haydende)
  */
-@DirtiesContext
 @SpringBootTest
 class AuthServiceSpec extends Specification {
 

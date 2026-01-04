@@ -17,16 +17,51 @@ trait StateTrait {
     long userId = 1L
     long passageId = 1L
 
-    User user = new User('email', 'password', [game], [read])
+    User user = new User(
+        'email',
+        'password',
+        "John",
+        "Smith",
+        "My Church",
+        [game], [read], []
+    )
 
-    ReadData readData = new ReadData('passage-key')
+    ReadData readData = new ReadData(
+        'passage-key',
+        'book',
+        'chapter',
+        'verse-start',
+        'verse-end'
+    )
 
-    GuessData guessData = new GuessData('book', 'chapter', 1, 2)
+    GuessData guessData = new GuessData(
+        'book',
+        'chapter',
+        1,
+        2,
+        'passage-book',
+        'passage-chapter'
+    )
 
-    Read read = new Read('passage-key', user)
+    Read read = new Read(
+        'passage-key',
+        'book',
+        'chapter',
+        'verse-start',
+        'verse-end',
+        user
+    )
 
-    Guess guess = new Guess('book', 'chapter', 1, 2)
+    Guess guess = new Guess(1, 2, 'book', 'chapter')
 
-    Game game = new Game(1L, true, 0, [guess], user)
+    Game game = new Game(
+        1L,
+        'passage-book',
+        'passage-chapter',
+        true,
+        0,
+        [guess],
+        user
+    )
 
 }
