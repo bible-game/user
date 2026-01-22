@@ -8,6 +8,7 @@ import game.bible.user.auth.model.PasswordResetToken.ResetTokenState
 import game.bible.user.auth.repository.PasswordResetTokenRepository
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import kotlin.jvm.optionals.getOrElse
@@ -21,6 +22,7 @@ class AuthService(
     private val userRepo: UserRepository,
     private val resetTokenRepo: PasswordResetTokenRepository,
     private val securityConfig: SecurityConfig,
+    private val passwordEncoder: PasswordEncoder,
 ) {
 
     private fun currentTime() = LocalDateTime.now()
@@ -42,7 +44,7 @@ class AuthService(
         log.debug("Handling password reset request for User ID: [{}]", resetToken.user.id!!)
 
         try {
-            userRepo.updatePassword(resetToken.user.id!!, data.password)
+            userRepo.updatePassword(resetToken.user.id!!, passwordEncoder.encode(data.password))
             resetToken.state = ResetTokenState.USED
             resetTokenRepo.save(resetToken)
         } catch (e: Exception) {
