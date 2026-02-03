@@ -7,7 +7,6 @@ import game.bible.user.auth.model.PasswordResetToken
 import game.bible.user.auth.repository.PasswordResetTokenRepository
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
-import jakarta.persistence.PersistenceContext
 import jakarta.persistence.PersistenceUnit
 import jakarta.transaction.Transactional
 import okhttp3.mockwebserver.MockResponse
@@ -18,13 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.annotation.DirtiesContext
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.time.LocalDateTime
 
 import static game.bible.user.auth.model.PasswordResetToken.ResetTokenState
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
@@ -45,6 +46,7 @@ class AuthControllerIT extends Specification {
     @Autowired MockMvc mockMvc
     @Autowired UserRepository userRepo
     @Autowired PasswordResetTokenRepository resetTokenRepo
+    @Autowired PasswordEncoder encoder
 
     User user
 
@@ -73,6 +75,48 @@ class AuthControllerIT extends Specification {
 
     def cleanupSpec() {
         mockWebServer.shutdown()
+    }
+
+    @Transactional
+    @Unroll("when a token whose tokenState is #tokenState, then return #tokenValid")
+    def "Verify token via GET request"() {
+        given:
+        def now = LocalDateTime.now()
+        def savedToken =
+            resetTokenRepo.save(
+                new PasswordResetToken(
+                    null,
+                    user,
+                    tokenState,
+                    tokenValid ? now : now.minusMinutes(30),
+                    tokenValid ? now.plusMinutes(30) : now
+                )
+            )
+        when:
+        def response = mockMvc.perform(
+            get("/auth/validate-token")
+                .queryParam("token", savedToken.token)
+        )
+            .andDo(print())
+
+        then: "Verify no exceptions thrown"
+        noExceptionThrown()
+
+        and: "Verify the response"
+        response.andExpectAll(
+            status().isOk(),
+            jsonPath("result").value(tokenValid)
+        )
+
+        then:
+        where:
+        tokenState               | tokenValid
+        ResetTokenState.ACTIVE   | true  // Token ACTIVE, expireAt ahead of current time
+        ResetTokenState.ACTIVE   | false // Token ACTIVE, expireAt before current time
+        ResetTokenState.EXPIRED  | false // Token EXPIRED
+        ResetTokenState.USED     | false // Token USED
+        ResetTokenState.REPLACED | false // Token REPLACED
+
     }
 
     def "when a user requests to reset their password, then generate a new token and send an email"() {
@@ -193,7 +237,7 @@ class AuthControllerIT extends Specification {
 
         and: "Verify that the user's password has been updated"
         def updatedUser = userRepo.findById(user.id).get()
-        updatedUser.password == resetData.password
+        encoder.matches(resetData.password, updatedUser.password)
 
         and: "Verify that the PasswordResetToken is now marked as USED"
         def updatedToken = resetTokenRepo.findById(resetToken.token).get()
@@ -218,7 +262,7 @@ class AuthControllerIT extends Specification {
         and: "Verify HTTP 400 Response with appropriate message"
         response
             .andExpect(status().is4xxClientError())
-            .andExpect(jsonPath("message").value("Token [${resetData.resetToken}] does not exist" as String))
+            .andExpect(jsonPath("message").value("Token [${resetData.resetToken}] does not exist!" as String))
 
         and: "Verify the user's password is unchanged"
         def session = entityManager.unwrap(Session.class)

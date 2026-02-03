@@ -28,19 +28,24 @@ class AuthService(
     private fun currentTime() = LocalDateTime.now()
 
     @Transactional
-    fun updatePassword(data: PasswordResetData) {
-        val resetToken = resetTokenRepo.findById(data.resetToken).let {
-            val token = it.getOrElse { throw IllegalStateException("Token [${data.resetToken}] does not exist") }
-            if (token.expiresAt.isBefore(currentTime())) {
-                token.state = ResetTokenState.EXPIRED
-                log.debug("Submitted reset token ${token.token} marked as EXPIRED")
-                resetTokenRepo.save(token)
-            }
-            if (token.state !== ResetTokenState.ACTIVE) {
-                throw IllegalStateException("Token [${data.resetToken}] has expired")
-            }
-            token
+    fun isTokenValid(token: String): Boolean {
+
+        return try {
+            validateToken(token)
+            true
+        } catch (isE: IllegalStateException) {
+            log.debug("Caught exception when validating token $token:", isE)
+            false
         }
+    }
+
+    /**
+     * Given a valid and ACTIVE token is provided, reset the User's password with the one provided.
+     * Upon successful reset, update the state of the matching token to USED
+     */
+    @Transactional
+    fun updatePassword(data: PasswordResetData) {
+        val resetToken = validateToken(data.resetToken)
         log.debug("Handling password reset request for User ID: [{}]", resetToken.user.id!!)
 
         try {
@@ -90,6 +95,25 @@ class AuthService(
         val savedToken = resetTokenRepo.save(newToken)
 
         return savedToken.token!!
+    }
+
+    /**
+     * Process requested token, mark as EXPIRED if the timeout has elapsed. Exceptions thrown
+     * are propagated to GlobalExceptionHandler for returning the appropriate HTTP response
+     */
+    private fun validateToken(token: String): PasswordResetToken {
+        val match = resetTokenRepo.findById(token).getOrElse {
+            throw IllegalStateException("Token [$token] does not exist!")
+        }
+        if (match.expiresAt.isBefore(currentTime())) {
+            match.state = ResetTokenState.EXPIRED
+            log.debug("Submitted reset token [${match.token} marked as EXPIRED")
+            resetTokenRepo.save(match)
+        }
+        if (match.state !== ResetTokenState.ACTIVE) {
+            throw IllegalStateException("Token [${match.token}] has expired")
+        }
+        return match
     }
 
     companion object {

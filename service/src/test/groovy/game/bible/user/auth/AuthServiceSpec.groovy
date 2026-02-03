@@ -9,11 +9,11 @@ import jakarta.persistence.EntityManagerFactory
 import jakarta.persistence.PersistenceUnit
 import jakarta.transaction.Transactional
 import org.hibernate.Session
+import org.springframework.security.crypto.password.PasswordEncoder
 
 import java.time.LocalDateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.annotation.DirtiesContext
 import spock.lang.Specification
 
 import static game.bible.user.auth.model.PasswordResetToken.ResetTokenState
@@ -29,6 +29,7 @@ class AuthServiceSpec extends Specification {
     EntityManager entityManager
 
     @PersistenceUnit EntityManagerFactory emFactory
+    @Autowired PasswordEncoder encoder
     @Autowired PasswordResetTokenRepository resetTokenRepo
     @Autowired UserRepository userRepo
     @Autowired AuthService authService
@@ -67,7 +68,7 @@ class AuthServiceSpec extends Specification {
         and: "Verify that the new password has been applied"
         tx.begin()
         def updatedUser = userRepo.findById(user.id).get()
-        updatedUser.password == "N3wpassword!"
+        encoder.matches("N3wpassword!", updatedUser.password)
 
         and: "Verify that the password reset token is now USED"
         def updatedToken = resetTokenRepo.findById(resetToken.token).get()
@@ -84,7 +85,7 @@ class AuthServiceSpec extends Specification {
 
         then: "Verify the exception is thrown with the right message"
         def thrown = thrown(IllegalStateException.class)
-        thrown.message == "Token [${data.resetToken}] does not exist"
+        thrown.message == "Token [${data.resetToken}] does not exist!"
     }
 
     @Transactional

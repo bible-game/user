@@ -4,6 +4,7 @@ import game.bible.user.info.InfoService
 import game.bible.user.notification.NotificationService
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -22,6 +23,16 @@ class AuthController(
     private val userInfoService: InfoService,
     private val notificationService: NotificationService,
 ) {
+
+    @GetMapping("/validate-token")
+    fun validateToken(@RequestParam token: String): ResponseEntity<Map<String, Any?>> {
+        log.info("Validating PasswordResetToken [{}]", token)
+        return ResponseEntity.ok(
+            mapOf(
+                "result" to authService.isTokenValid(token)
+            )
+        )
+    }
 
     @PutMapping("/update-password")
     fun updatePassword(@RequestBody data: PasswordResetData): ResponseEntity<Any> {
