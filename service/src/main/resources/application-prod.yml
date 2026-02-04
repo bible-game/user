@@ -1,5 +1,5 @@
 cors:
-  originPatterns: "https://bible.game,https://admin.bible.game,https://dev.bible.game"
+  originPatterns: "https://bible.game,https://admin.bible.game,https://dev.bible.game,https://exp.bible.game,https://expbiblegame.vercel.app"
 spring:
   datasource:
     url: jdbc:postgresql://${POSTGRES_URL}
