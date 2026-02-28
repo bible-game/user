@@ -29,12 +29,9 @@ class EmailClient {
         val email = TransactionalEmail.builder()
             .to(SendContact(email))
             .from(SendContact(userConfig.getComms()!!.getSendAddress()))
-            .subject("Your password reset request for bible.game")
-            .htmlPart("""
-                <h1>You have requested a reset of your password for bible.game</h1>
-                <p>If this wasn't you, feel free to ignore.</p>
-                <p>If this was you, please follow this link: https://bible.game/reset?token=${resetToken}</p>
-            """.trimIndent())
+            .templateID(userConfig.getComms()!!.getTemplateId())
+            .templateLanguage(true)
+            .variable("resetLink", "${userConfig.getResetUrl()!!}?token=$resetToken")
             .build()
 
         val request = SendEmailsRequest.builder()
