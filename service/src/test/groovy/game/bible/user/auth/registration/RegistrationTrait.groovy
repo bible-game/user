@@ -17,7 +17,14 @@ trait RegistrationTrait {
 
     /** Return sample registration data */
     RegistrationData getData(String email, String password) {
-        def data = new RegistrationData(email, password)
+        def data = new RegistrationData(
+            email,
+            password,
+            'John',
+            'Smith',
+            'Some Church',
+            [], [], []
+        )
 
         return data
     }

@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Ignore
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@TestPropertySource("classpath:config-test.yml")
+@TestPropertySource("classpath:config.yml")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StateIT extends Specification implements StateTrait {
 
