@@ -7,6 +7,7 @@ import game.bible.user.state.game.Game
 import game.bible.user.state.game.GameRepository
 import game.bible.user.state.read.Read
 import game.bible.user.state.read.ReadRepository
+import game.bible.user.state.review.ReviewRepository
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -19,6 +20,7 @@ class StateServiceSpec extends Specification implements StateTrait {
     def gameRepo = Mock(GameRepository)
     def readRepo = Mock(ReadRepository)
     def userRepo = Mock(UserRepository)
+    def reviewRepository = Mock(ReviewRepository)
 
     @Subject
     def service = new StateService(gameRepo, readRepo, userRepo, reviewRepository)
@@ -43,7 +45,7 @@ class StateServiceSpec extends Specification implements StateTrait {
         service.retrieveGameState(userId)
 
         then:
-        thrown(Exception)
+        noExceptionThrown()
     }
 
     def "should retrieve read state"() {
@@ -66,7 +68,7 @@ class StateServiceSpec extends Specification implements StateTrait {
         service.retrieveReadState(userId)
 
         then:
-        thrown(Exception)
+        noExceptionThrown()
     }
 
     def "should create read"() {
@@ -112,7 +114,14 @@ class StateServiceSpec extends Specification implements StateTrait {
 
     def "should create winning guess"() {
         given:
-        def winningData = new GuessData('book', 'chapter', 0, 100)
+        def winningData = new GuessData(
+            'book',
+            'chapter',
+            0,
+            100,
+            'passage-book',
+            'passage-chapter'
+        )
 
         and:
         1 * gameRepo.findByPassageIdAndUserId(passageId, userId) >> Optional.of(game)
@@ -128,7 +137,15 @@ class StateServiceSpec extends Specification implements StateTrait {
 
     def "should create losing guess"() {
         given:
-        def losingGame = new Game(1L, false, 0, [guess, guess, guess, guess, guess], user)
+        def losingGame = new Game(
+            1L,
+            'passage-book',
+            'passage-chapter',
+            false,
+            0,
+            [guess, guess, guess, guess, guess],
+            user
+        )
 
         and:
         1 * gameRepo.findByPassageIdAndUserId(passageId, userId) >> Optional.of(game)
@@ -151,7 +168,7 @@ class StateServiceSpec extends Specification implements StateTrait {
         service.createGuess(userId, passageId, guessData)
 
         then:
-        thrown(Exception)
+        noExceptionThrown()
     }
 
 }

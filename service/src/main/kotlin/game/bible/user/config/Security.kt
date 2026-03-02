@@ -28,7 +28,9 @@ class Security(
                     .requestMatchers(HttpMethod.GET, "/health").permitAll()
                     .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/leader/**").permitAll()
-                    .requestMatchers(HttpMethod.PUT, "/auth/update-password").permitAll() // fixme!
+                    .requestMatchers(HttpMethod.GET, "/auth/validate-token").permitAll()
+                    // FixMe: Security should be tighter on this - Can we use the PasswordResetToken to authenticate?
+                    .requestMatchers(HttpMethod.PUT, "/auth/update-password").permitAll()
                     .anyRequest().authenticated()
             }
 

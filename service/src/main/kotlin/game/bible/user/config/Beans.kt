@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import game.bible.config.ReloadableConfig
 import game.bible.config.model.core.SecurityConfig
 import game.bible.config.model.integration.ChatGptConfig
+import game.bible.config.model.service.UserConfig
+import game.bible.user.notification.EmailClient
 import jakarta.servlet.http.HttpServletRequest
 
 /**
@@ -23,7 +25,10 @@ import jakarta.servlet.http.HttpServletRequest
 @Import(
     ReloadableConfig::class,
     ChatGptConfig::class,
-    SecurityConfig::class)
+    SecurityConfig::class,
+    UserConfig::class,
+    EmailClient::class,
+)
 class Beans {
 
     @Bean
