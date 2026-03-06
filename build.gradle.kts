@@ -43,7 +43,9 @@ subprojects {
         implementation(rootProject.libs.bundles.common)
         implementation(rootProject.libs.bundles.config)
         implementation(rootProject.libs.bundles.core)
-        implementation(rootProject.libs.bundles.data)
+        implementation(rootProject.libs.bundles.data) {
+            exclude(module = "spring-data-redis")
+        }
         implementation(rootProject.libs.bundles.database)
         implementation(rootProject.libs.bundles.integration)
         implementation(rootProject.libs.bundles.jwt)
