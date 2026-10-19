@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.sql.Timestamp
 import java.time.LocalDateTime
 import kotlin.jvm.optionals.getOrElse
 
@@ -34,7 +35,7 @@ class AuthService(
             validateToken(token)
             true
         } catch (isE: IllegalStateException) {
-            log.debug("Caught exception when validating token $token:", isE)
+            log.debug("Reset token failed validation: {}", isE.message)
             false
         }
     }
@@ -45,11 +46,14 @@ class AuthService(
      */
     @Transactional
     fun updatePassword(data: PasswordResetData) {
+        if (data.password.trim().length < MIN_PASSWORD_LENGTH) {
+            throw IllegalStateException("Password must be at least $MIN_PASSWORD_LENGTH characters long")
+        }
         val resetToken = validateToken(data.resetToken)
         log.debug("Handling password reset request for User ID: [{}]", resetToken.user.id!!)
 
         try {
-            userRepo.updatePassword(resetToken.user.id!!, passwordEncoder.encode(data.password))
+            userRepo.updatePassword(resetToken.user.id!!, passwordEncoder.encode(data.password), Timestamp(System.currentTimeMillis()))
             resetToken.state = ResetTokenState.USED
             resetTokenRepo.save(resetToken)
         } catch (e: Exception) {
@@ -88,7 +92,7 @@ class AuthService(
             expiresAt = currentTime.plusMinutes(resetConfig.getExpireInMins()!!),
         )
         if (existingToken != null) {
-            log.info("Replacing Password Reset Token [{}] with new token [{}] for User ID [{}]", existingToken.token, existingToken.token, user.id)
+            log.info("Replacing the active Password Reset Token for User ID [{}]", user.id)
             existingToken.state = ResetTokenState.REPLACED
             resetTokenRepo.save(existingToken)
         }
@@ -103,20 +107,22 @@ class AuthService(
      */
     private fun validateToken(token: String): PasswordResetToken {
         val match = resetTokenRepo.findById(token).getOrElse {
-            throw IllegalStateException("Token [$token] does not exist!")
+            throw IllegalStateException(INVALID_TOKEN)
         }
         if (match.expiresAt.isBefore(currentTime())) {
             match.state = ResetTokenState.EXPIRED
-            log.debug("Submitted reset token [${match.token} marked as EXPIRED")
+            log.debug("Submitted reset token for User ID [{}] marked as EXPIRED", match.user.id)
             resetTokenRepo.save(match)
         }
         if (match.state !== ResetTokenState.ACTIVE) {
-            throw IllegalStateException("Token [${match.token}] has expired")
+            throw IllegalStateException(INVALID_TOKEN)
         }
         return match
     }
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
+        private const val MIN_PASSWORD_LENGTH = 8
+        private const val INVALID_TOKEN = "This reset link is invalid or has expired. Please request a new one."
     }
 }

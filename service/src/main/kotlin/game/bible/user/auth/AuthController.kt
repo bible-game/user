@@ -26,17 +26,15 @@ class AuthController(
 
     @GetMapping("/validate-token")
     fun validateToken(@RequestParam token: String): ResponseEntity<Map<String, Any?>> {
-        log.info("Validating PasswordResetToken [{}]", token)
+        log.debug("Validating password reset token")
         return ResponseEntity.ok(
-            mapOf(
-                "result" to authService.isTokenValid(token)
-            )
+            mapOf("result" to authService.isTokenValid(token))
         )
     }
 
     @PutMapping("/update-password")
     fun updatePassword(@RequestBody data: PasswordResetData): ResponseEntity<Any> {
-        log.info("Update password request received with token [{}]", data.resetToken)
+        log.debug("Password update request received")
         return try {
             authService.updatePassword(data)
             ResponseEntity.ok().build()
@@ -56,16 +54,14 @@ class AuthController(
                 )
             )
         }
-        // FixMe :: proper security around who is changing who's password!! (get user from token?!)
     }
 
     @PostMapping("/request-password-reset")
     fun requestPasswordReset(@RequestParam email: String): ResponseEntity<Any> {
         val user = userInfoService.retrieveByEmail(email)
         if (user == null) {
-            return ResponseEntity
-                .badRequest()
-                .body("No user found with email: $email")
+            log.info("Password reset requested for an email with no account")
+            return ResponseEntity.ok().build()
 
         } else {
             val token = authService.createPasswordResetToken(user)

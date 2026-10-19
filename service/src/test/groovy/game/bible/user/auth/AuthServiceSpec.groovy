@@ -70,10 +70,25 @@ class AuthServiceSpec extends Specification {
         def updatedUser = userRepo.findById(user.id).get()
         encoder.matches("N3wpassword!", updatedUser.password)
 
+        and: "Verify the change time is recorded, which ends sessions from before it"
+        updatedUser.passwordChangedAt != null
+
         and: "Verify that the password reset token is now USED"
         def updatedToken = resetTokenRepo.findById(resetToken.token).get()
         updatedToken.state == ResetTokenState.USED
         tx.commit()
+    }
+
+    def 'updatePassword - when the new password is too short, throw an error before the token is checked'() {
+        given: "Create the PasswordResetData"
+        def data = new PasswordResetData("aninvalidToken", "short")
+
+        when: "We call the AuthService to reset the password"
+        authService.updatePassword(data)
+
+        then: "Verify the exception is about the password"
+        def thrown = thrown(IllegalStateException.class)
+        thrown.message == "Password must be at least 8 characters long"
     }
 
     def 'updatePassword - when an invalid token is provided, throw an error'() {
@@ -85,7 +100,7 @@ class AuthServiceSpec extends Specification {
 
         then: "Verify the exception is thrown with the right message"
         def thrown = thrown(IllegalStateException.class)
-        thrown.message == "Token [${data.resetToken}] does not exist!"
+        thrown.message == "This reset link is invalid or has expired. Please request a new one."
     }
 
     @Transactional
@@ -109,7 +124,7 @@ class AuthServiceSpec extends Specification {
 
         then: "Verify the right exception is thrown with the right message"
         def thrown = thrown(IllegalStateException.class)
-        thrown.message == "Token [${data.resetToken}] has expired"
+        thrown.message == "This reset link is invalid or has expired. Please request a new one."
     }
 
     @Transactional
