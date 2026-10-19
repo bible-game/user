@@ -1,6 +1,7 @@
 package game.bible.user.config
 
 import game.bible.common.util.security.TokenFilter
+import game.bible.user.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -15,13 +16,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  */
 @Configuration @EnableWebSecurity
 class Security(
-    private val tokenFilter: TokenFilter) {
+    private val tokenFilter: TokenFilter,
+    private val userRepository: UserRepository) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): DefaultSecurityFilterChain {
         http
             .csrf { it.disable() }
             .addFilterAfter(tokenFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterAfter(SessionFilter(userRepository), TokenFilter::class.java)
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
                 it
@@ -29,7 +32,6 @@ class Security(
                     .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/leader/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/auth/validate-token").permitAll()
-                    // FixMe: Security should be tighter on this - Can we use the PasswordResetToken to authenticate?
                     .requestMatchers(HttpMethod.PUT, "/auth/update-password").permitAll()
                     .anyRequest().authenticated()
             }
