@@ -1,8 +1,6 @@
 package game.bible.user.auth.login
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -21,14 +19,10 @@ class LoginController(private val service: LoginService) {
 
     /** Logs in and retrieves an authentication token */
     @PostMapping
-    fun login(
-        req: HttpServletRequest,
-        res: HttpServletResponse,
-        @RequestBody data: LoginData): ResponseEntity<Any>
-    {
+    fun login(@RequestBody data: LoginData): ResponseEntity<Any> {
         log.info { "Login request received [${data.email}]" }
 
-        val response = service.login(req, res, data)
+        val response = service.login(data)
         return ResponseEntity.ok(response)
 
     }
