@@ -1,0 +1,16 @@
+cors:
+  originPatterns: "https://dev.bible.game"
+spring:
+  datasource:
+    url: jdbc:h2:mem:bible_db;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  h2:
+    console:
+      enabled: false
