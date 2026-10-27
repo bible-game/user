@@ -22,6 +22,11 @@ management:
     web:
       base-path: /
 spring:
+  jpa:
+    properties:
+      hibernate:
+        # Loads lazy collections (a game's guesses, a review's answers) for up to 100 parents in one query, not one each
+        default_batch_fetch_size: 100
   ai:
     openai:
       api-key: "${OPENAI_KEY}"

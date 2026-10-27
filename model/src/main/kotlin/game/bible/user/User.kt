@@ -8,7 +8,6 @@ import game.bible.user.state.review.Review
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.FetchType.EAGER
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import java.sql.Timestamp
@@ -26,14 +25,13 @@ data class User(
     val lastname: String = "",
     val church: String = "",
 
-    // State
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = EAGER)
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
     @JsonManagedReference("app_user_game")
     val games: MutableList<Game> = mutableListOf(),
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = EAGER)
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
     @JsonManagedReference("app_user_read")
     val reads: MutableList<Read> = mutableListOf(),
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = EAGER)
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
     @JsonManagedReference("app_user_review")
     val reviews: MutableList<Review> = mutableListOf()
 
