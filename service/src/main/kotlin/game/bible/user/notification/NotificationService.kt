@@ -9,7 +9,7 @@ class NotificationService(
 ) {
 
     fun sendResetRequest(email: String, resetToken: String) {
-        log.info("Building Password Reset request email for user: [{}] with token: [{}]", email, resetToken)
+        log.info("Building Password Reset request email for user: [{}]", email)
         emailClient.sendResetEmail(email, resetToken)
     }
 

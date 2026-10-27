@@ -1,10 +1,7 @@
 package game.bible.user.auth.login
 
 import game.bible.common.util.security.TokenManager
-import game.bible.config.model.core.SecurityConfig
 import game.bible.user.UserRepository
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.AuthenticationManager
 import spock.lang.Ignore
 import spock.lang.Specification
@@ -19,14 +16,11 @@ class LoginServiceSpec extends Specification implements LoginTrait {
     def authManager = Stub(AuthenticationManager)
     def tokenManager = Mock(TokenManager)
     def userRepo = Mock(UserRepository)
-    def config = Stub(SecurityConfig)
 
     def jwt = 'token'
-    def req = Stub(HttpServletRequest)
-    def res = Stub(HttpServletResponse)
 
     @Subject
-    def service = new LoginService(userRepo, authManager, tokenManager, config)
+    def service = new LoginService(userRepo, authManager, tokenManager)
 
     @Ignore
     def "should return jwt when valid credentials are provided"() {
@@ -34,7 +28,7 @@ class LoginServiceSpec extends Specification implements LoginTrait {
         1 * userRepo.findByEmail(data.email) >> Optional.of(user)
 
         when:
-        def result = service.login(req, res, data)
+        def result = service.login(data)
 
         then:
         result == jwt
@@ -50,7 +44,7 @@ class LoginServiceSpec extends Specification implements LoginTrait {
         userRepo.findByEmail(email) >> Optional.empty()
 
         when:
-        service.login(req, res,  data)
+        service.login(data)
 
         then:
         thrown(Exception)
@@ -66,7 +60,7 @@ class LoginServiceSpec extends Specification implements LoginTrait {
         userRepo.findByEmail(email) >> Optional.of(existing)
 
         when:
-        service.login(req, res, data)
+        service.login(data)
 
         then:
         thrown(Exception)

@@ -6,10 +6,12 @@ import game.bible.user.state.game.Game
 import game.bible.user.state.read.Read
 import game.bible.user.state.review.Review
 import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType.EAGER
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
+import java.sql.Timestamp
 
 /**
  * User Model
@@ -35,4 +37,10 @@ data class User(
     @JsonManagedReference("app_user_review")
     val reviews: MutableList<Review> = mutableListOf()
 
-) : BaseEntity()
+) : BaseEntity() {
+
+    /** When the password was last changed; tokens issued before then are no longer accepted */
+    @Column(name = "password_changed_at")
+    var passwordChangedAt: Timestamp? = null
+
+}

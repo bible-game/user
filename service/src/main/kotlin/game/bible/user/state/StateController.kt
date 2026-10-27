@@ -3,6 +3,7 @@ package game.bible.user.state
 import game.bible.user.state.data.GuessData
 import game.bible.user.state.data.ReadData
 import game.bible.user.state.data.ReviewData
+import game.bible.user.state.data.SyncData
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -143,5 +144,25 @@ class StateController(
         }
     }
 
-}
+    /** Merges browser state recorded while logged out into the user's state */
+    @PostMapping("/sync")
+    fun sync(
+        auth: Authentication,
+        @RequestBody data: SyncData
+    ): ResponseEntity<Any> {
+        return try {
+            val userId = (auth.principal as String).toLongOrNull()
+                ?: throw Exception()
 
+            log.info { "Incoming state sync from user with id [$userId]" }
+
+            val result = service.sync(userId, data)
+            ResponseEntity.status(200).body(result)
+
+        } catch (e: Exception) {
+            log.error { e.message }
+            ResponseEntity.internalServerError().build()
+        }
+    }
+
+}

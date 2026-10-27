@@ -152,6 +152,24 @@ class AuthControllerIT extends Specification {
 
     }
 
+    def "when a password reset is requested for an email with no account, then respond as normal but send nothing"() {
+        given: "The emails sent so far (the mock server is shared across this spec)"
+        def sentBefore = mockWebServer.getRequestCount()
+
+        when: "we request a password reset for an unknown email"
+        def response = mockMvc.perform(
+            post("/auth/request-password-reset")
+                .queryParam("email", "nobody@mail.com")
+        )
+            .andDo(print())
+
+        then: "verify the same HTTP 200 response as for a real account"
+        response.andExpect(status().isOk())
+
+        and: "verify no email was sent"
+        mockWebServer.getRequestCount() == sentBefore
+    }
+
     @Transactional
     def "when a user requests to reset their password, and they already have an active token, then the old token is replaced and a new email is sent"() {
         given: "We create an ACTIVE PasswordResetToken for our user"
@@ -262,7 +280,7 @@ class AuthControllerIT extends Specification {
         and: "Verify HTTP 400 Response with appropriate message"
         response
             .andExpect(status().is4xxClientError())
-            .andExpect(jsonPath("message").value("Token [${resetData.resetToken}] does not exist!" as String))
+            .andExpect(jsonPath("message").value("This reset link is invalid or has expired. Please request a new one."))
 
         and: "Verify the user's password is unchanged"
         def session = entityManager.unwrap(Session.class)

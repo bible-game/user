@@ -2,11 +2,17 @@
 package game.bible.user.state
 
 import game.bible.user.UserRepository
+import game.bible.user.state.data.GameData
+import game.bible.user.state.data.GradingResultData
 import game.bible.user.state.data.GuessData
+import game.bible.user.state.data.ReviewData
+import game.bible.user.state.data.SyncData
 import game.bible.user.state.game.Game
 import game.bible.user.state.game.GameRepository
 import game.bible.user.state.read.Read
 import game.bible.user.state.read.ReadRepository
+import game.bible.user.state.review.GradingResult
+import game.bible.user.state.review.Review
 import game.bible.user.state.review.ReviewRepository
 import spock.lang.Specification
 import spock.lang.Subject
@@ -169,6 +175,83 @@ class StateServiceSpec extends Specification implements StateTrait {
 
         then:
         noExceptionThrown()
+    }
+
+    def "should sync a local game the user doesn't have, scoring it here"() {
+        given:
+        def winning = new GuessData('book', 'chapter', 0, 100, 'passage-book', 'passage-chapter')
+        def local = new GameData(2L, 5, [guessData, winning, guessData], false)
+
+        and:
+        1 * userRepo.findById(userId) >> Optional.of(user)
+        1 * gameRepo.findAllByUserId(userId) >> [game]
+        1 * readRepo.findAllByUserId(userId) >> []
+        1 * reviewRepository.findAllByUserId(userId) >> []
+
+        when:
+        def result = service.sync(userId, new SyncData([local], [], []))
+
+        then:
+        1 * gameRepo.save({ Game g -> g.passageId == 2L && g.guesses.size() == 2 && !g.playing && g.stars == 4 })
+        result.games == 1
+    }
+
+    def "should keep a finished server game over a local one"() {
+        given:
+        game.playing = false
+        def local = new GameData(passageId, 0, [guessData, guessData, guessData], true)
+
+        and:
+        1 * userRepo.findById(userId) >> Optional.of(user)
+        1 * gameRepo.findAllByUserId(userId) >> [game]
+        1 * readRepo.findAllByUserId(userId) >> []
+        1 * reviewRepository.findAllByUserId(userId) >> []
+
+        when:
+        def result = service.sync(userId, new SyncData([local], [], []))
+
+        then:
+        0 * gameRepo.save(_)
+        result.games == 0
+    }
+
+    def "should take a local game with more guesses than the server's unfinished one"() {
+        given:
+        def local = new GameData(passageId, 0, [guessData] * 5, false)
+
+        and:
+        1 * userRepo.findById(userId) >> Optional.of(user)
+        1 * gameRepo.findAllByUserId(userId) >> [game]
+        1 * readRepo.findAllByUserId(userId) >> []
+        1 * reviewRepository.findAllByUserId(userId) >> []
+
+        when:
+        def result = service.sync(userId, new SyncData([local], [], []))
+
+        then:
+        1 * gameRepo.save({ Game g -> g.is(game) && g.guesses.size() == 5 && !g.playing && g.stars == 0 })
+        result.games == 1
+    }
+
+    def "should only sync reads and reviews for passages the user doesn't have"() {
+        given:
+        def newRead = new ReadData('other-key', 'book', 'chapter', 'verse-start', 'verse-end')
+        def review = new ReviewData('passage-key', 'date', 3, 'summary', ['answer'], new GradingResultData(3, 'message'))
+
+        and:
+        1 * userRepo.findById(userId) >> Optional.of(user)
+        1 * gameRepo.findAllByUserId(userId) >> []
+        1 * readRepo.findAllByUserId(userId) >> [read]
+        1 * reviewRepository.findAllByUserId(userId) >> [new Review('passage-key', 'date', 3, 'summary', ['answer'], new GradingResult(3, 'message'), user)]
+
+        when:
+        def result = service.sync(userId, new SyncData([], [readData, newRead, newRead], [review]))
+
+        then:
+        1 * readRepo.saveAll({ List<Read> r -> r*.passageKey == ['other-key'] })
+        1 * reviewRepository.saveAll([])
+        result.reads == 1
+        result.reviews == 0
     }
 
 }
