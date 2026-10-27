@@ -5,6 +5,7 @@ import game.bible.user.UserRepository
 import game.bible.user.state.data.GameData
 import game.bible.user.state.data.GradingResultData
 import game.bible.user.state.data.GuessData
+import game.bible.user.state.data.ReadData
 import game.bible.user.state.data.ReviewData
 import game.bible.user.state.data.SyncData
 import game.bible.user.state.game.Game
