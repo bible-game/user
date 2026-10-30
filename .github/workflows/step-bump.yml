@@ -1,0 +1,26 @@
+name: bump
+on:
+  workflow_call:
+jobs:
+  bump:
+    concurrency: ci-develop
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+      - name: Set-up Git 🐵
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+      - name: Merge Release ➡️
+        run: git merge origin/main --no-edit -m "Merge release into develop"
+      - name: Add -SNAPSHOT 📷
+        run: |
+          VERSION="$(grep '^version=' gradle.properties | cut -d "=" -f 2 | cut -d "-" -f 1)"
+          SNAPSHOT="$(echo "$VERSION" | cut -d "." -f 1-2).$((1 + $(echo "$VERSION" | cut -d "." -f 3)))-SNAPSHOT"
+          sed -i "s/^version=.*/version=$SNAPSHOT/" gradle.properties
+          git commit -am "[bump] $SNAPSHOT"
+          git push origin HEAD

@@ -19,12 +19,18 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
-      - name: Tag 🏷️
+      - name: Release Version and Tag 🏷️
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "VERSION=$(./gradlew -q printTagVersion)" >> $GITHUB_ENV
-          ./gradlew release
+          VERSION="$(./gradlew -q printTagVersion)"
+          sed -i "s/^version=.*/version=$VERSION/" gradle.properties
+          ./gradlew build
+          git commit -am "[release] user-$VERSION"
+          git tag "$VERSION" -m "[release] user-$VERSION"
+          git push origin HEAD "$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+        # Note :: -SNAPSHOT is only stripped here; the next one is added to develop by step-bump
       - name: Release 📦
         uses: softprops/action-gh-release@v1
         with:

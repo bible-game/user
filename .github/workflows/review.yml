@@ -1,0 +1,39 @@
+name: review
+on:
+  pull_request:
+    branches: [ develop, main ]
+  push:
+    branches: [ develop, main ]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+      - name: Review Dependencies 🔍
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+  submit:
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+      packages: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+      - name: Set-up Java ☕
+        uses: actions/setup-java@v4
+        with:
+          distribution: corretto
+          java-version: 21
+      - name: Submit Dependencies 📡
+        uses: gradle/actions/dependency-submission@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Note :: sends the resolved graph (catalog included) to GitHub, which Dependabot alerts read
