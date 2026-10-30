@@ -1,17 +1,8 @@
-#name: develop
-#on:
-#  push:
-#    branches: [ develop ]
-#jobs:
-#  test:
-#    name: test
-#    uses: ./.github/workflows/step-test.yml
-#  deploy:
-#    needs: test
-#    name: deploy
-#    permissions:
-#      packages: write
-#      contents: write
-#    env:
-#      environment: dev
-#    uses: ./.github/workflows/step-deploy.yml
+name: develop
+on:
+  push:
+    branches: [ develop ]
+jobs:
+  test:
+    name: test
+    uses: ./.github/workflows/step-test.yml

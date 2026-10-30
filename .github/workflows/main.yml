@@ -4,11 +4,11 @@ on:
     branches: [ main ]
   workflow_dispatch:
 jobs:
-#  test:
-#    name: test
-#    uses: ./.github/workflows/step-test.yml
+  test:
+    name: test
+    uses: ./.github/workflows/step-test.yml
   release:
-#    needs: test
+    needs: test
     name: release
     permissions:
       packages: write
@@ -20,12 +20,3 @@ jobs:
     permissions:
       contents: write
     uses: ./.github/workflows/step-bump.yml
-#  deploy:
-#    needs: bump
-#    name: deploy
-#    permissions:
-#      packages: write
-#      contents: write
-#    env:
-#      environment: prod
-#    uses: ./.github/workflows/step-deploy.yml
