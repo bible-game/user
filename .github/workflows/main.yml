@@ -14,14 +14,14 @@ jobs:
       packages: write
       contents: write
     uses: ./.github/workflows/step-release.yml
-  merge:
+  bump:
     needs: release
-    name: merge
+    name: bump
     permissions:
       contents: write
-    uses: ./.github/workflows/step-merge.yml
+    uses: ./.github/workflows/step-bump.yml
 #  deploy:
-#    needs: merge
+#    needs: bump
 #    name: deploy
 #    permissions:
 #      packages: write
