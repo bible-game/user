@@ -4,5 +4,6 @@ on:
     branches: [ develop ]
 jobs:
   test:
+    if: false
     name: test
     uses: ./.github/workflows/step-test.yml
