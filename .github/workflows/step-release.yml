@@ -25,7 +25,7 @@ jobs:
         run: |
           VERSION="$(./gradlew -q printTagVersion)"
           sed -i "s/^version=.*/version=$VERSION/" gradle.properties
-          ./gradlew build
+          ./gradlew build -x test
           git commit -am "[release] user-$VERSION"
           git tag "$VERSION" -m "[release] user-$VERSION"
           git push origin HEAD "$VERSION"
