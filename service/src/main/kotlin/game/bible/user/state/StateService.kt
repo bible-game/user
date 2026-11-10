@@ -107,7 +107,8 @@ class StateService(
      */
     @Transactional
     fun sync(userId: Long, data: SyncData): SyncResult {
-        val user = userRepository.findById(userId).get()
+        // Serialize concurrent snapshots from multiple tabs/devices before checking passage keys.
+        val user = userRepository.findForClerkMigration(userId).get()
 
         val games = gameRepository.findAllByUserId(userId).associateBy { it.passageId }
         var syncedGames = 0

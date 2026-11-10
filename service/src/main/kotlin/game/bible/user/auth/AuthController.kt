@@ -1,5 +1,6 @@
 package game.bible.user.auth
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import game.bible.user.info.InfoService
 import game.bible.user.notification.NotificationService
 import org.slf4j.LoggerFactory
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController
  * @since 19th July 2025
  */
 @RestController
+@ConditionalOnProperty(prefix = "clerk", name = ["enabled"], havingValue = "false", matchIfMissing = true)
 @RequestMapping("/auth")
 class AuthController(
     private val authService: AuthService,

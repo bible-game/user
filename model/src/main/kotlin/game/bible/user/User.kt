@@ -19,11 +19,11 @@ import java.sql.Timestamp
 @Entity
 @Table(name = "app_user")
 data class User(
-    val email: String = "",
+    var email: String = "",
     val password: String = "",
-    val firstname: String = "",
-    val lastname: String = "",
-    val church: String = "",
+    var firstname: String = "",
+    var lastname: String = "",
+    var church: String = "",
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
     @JsonManagedReference("app_user_game")
@@ -36,6 +36,17 @@ data class User(
     val reviews: MutableList<Review> = mutableListOf()
 
 ) : BaseEntity() {
+
+    @Column(name = "clerk_user_id", unique = true)
+    var clerkUserId: String? = null
+
+    /** Set only after the Backend API confirms ownership of the primary email. */
+    @Column(name = "clerk_email_verified_at")
+    var clerkEmailVerifiedAt: Timestamp? = null
+
+
+    @Column(name = "profile_completed_at")
+    var profileCompletedAt: Timestamp? = null
 
     /** When the password was last changed; tokens issued before then are no longer accepted */
     @Column(name = "password_changed_at")

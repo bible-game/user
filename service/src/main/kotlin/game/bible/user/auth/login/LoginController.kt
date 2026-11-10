@@ -1,5 +1,6 @@
 package game.bible.user.auth.login
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -14,6 +15,7 @@ private val log = KotlinLogging.logger {}
  * @since 5th June 2025
  */
 @RestController
+@ConditionalOnProperty(prefix = "clerk", name = ["enabled"], havingValue = "false", matchIfMissing = true)
 @RequestMapping("/auth/login")
 class LoginController(private val service: LoginService) {
 

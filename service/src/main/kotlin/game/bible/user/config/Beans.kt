@@ -3,6 +3,8 @@ package game.bible.user.config
 import com.fasterxml.jackson.databind.ObjectMapper
 import game.bible.common.util.security.TokenFilter
 import game.bible.common.util.security.TokenManager
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -46,7 +48,13 @@ class Beans {
     ): TokenManager = TokenManager(config, mapper, request)
 
     @Bean
+    @ConditionalOnProperty(prefix = "clerk", name = ["enabled"], havingValue = "false", matchIfMissing = true)
     fun tokenFilter(manager: TokenManager): TokenFilter =
         TokenFilter(manager).excludes(listOf("/auth", "/health", "/leader"))
+
+    @Bean
+    @ConditionalOnProperty(prefix = "clerk", name = ["enabled"], havingValue = "false", matchIfMissing = true)
+    fun legacyTokenFilterRegistration(filter: TokenFilter): FilterRegistrationBean<TokenFilter> =
+        FilterRegistrationBean(filter).also { it.isEnabled = false }
 
 }

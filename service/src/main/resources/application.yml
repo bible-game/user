@@ -30,3 +30,12 @@ spring:
   ai:
     openai:
       api-key: "${OPENAI_KEY}"
+
+# Enable only alongside the webapp cut-over and after applying the additive schema migration.
+clerk:
+  enabled: "${CLERK_ENABLED:false}"
+  issuer: "${CLERK_ISSUER:}"
+  secret-key: "${CLERK_SECRET_KEY:}"
+  authorized-parties: "${CLERK_AUTHORIZED_PARTIES:}"
+  webhook-signing-secret: "${CLERK_WEBHOOK_SIGNING_SECRET:}"
+  instance-id: "${CLERK_INSTANCE_ID:}"

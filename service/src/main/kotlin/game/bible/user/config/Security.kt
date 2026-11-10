@@ -2,6 +2,7 @@ package game.bible.user.config
 
 import game.bible.common.util.security.TokenFilter
 import game.bible.user.UserRepository
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Service-level Security Settings
  */
 @Configuration @EnableWebSecurity
+@ConditionalOnProperty(prefix = "clerk", name = ["enabled"], havingValue = "false", matchIfMissing = true)
 class Security(
     private val tokenFilter: TokenFilter,
     private val userRepository: UserRepository) {

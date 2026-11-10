@@ -184,7 +184,7 @@ class StateServiceSpec extends Specification implements StateTrait {
         def local = new GameData(2L, 5, [guessData, winning, guessData], false)
 
         and:
-        1 * userRepo.findById(userId) >> Optional.of(user)
+        1 * userRepo.findForClerkMigration(userId) >> Optional.of(user)
         1 * gameRepo.findAllByUserId(userId) >> [game]
         1 * readRepo.findAllByUserId(userId) >> []
         1 * reviewRepository.findAllByUserId(userId) >> []
@@ -203,7 +203,7 @@ class StateServiceSpec extends Specification implements StateTrait {
         def local = new GameData(passageId, 0, [guessData, guessData, guessData], true)
 
         and:
-        1 * userRepo.findById(userId) >> Optional.of(user)
+        1 * userRepo.findForClerkMigration(userId) >> Optional.of(user)
         1 * gameRepo.findAllByUserId(userId) >> [game]
         1 * readRepo.findAllByUserId(userId) >> []
         1 * reviewRepository.findAllByUserId(userId) >> []
@@ -221,7 +221,7 @@ class StateServiceSpec extends Specification implements StateTrait {
         def local = new GameData(passageId, 0, [guessData] * 5, false)
 
         and:
-        1 * userRepo.findById(userId) >> Optional.of(user)
+        1 * userRepo.findForClerkMigration(userId) >> Optional.of(user)
         1 * gameRepo.findAllByUserId(userId) >> [game]
         1 * readRepo.findAllByUserId(userId) >> []
         1 * reviewRepository.findAllByUserId(userId) >> []
@@ -240,7 +240,7 @@ class StateServiceSpec extends Specification implements StateTrait {
         def review = new ReviewData('passage-key', 'date', 3, 'summary', ['answer'], new GradingResultData(3, 'message'))
 
         and:
-        1 * userRepo.findById(userId) >> Optional.of(user)
+        1 * userRepo.findForClerkMigration(userId) >> Optional.of(user)
         1 * gameRepo.findAllByUserId(userId) >> []
         1 * readRepo.findAllByUserId(userId) >> [read]
         1 * reviewRepository.findAllByUserId(userId) >> [new Review('passage-key', 'date', 3, 'summary', ['answer'], new GradingResult(3, 'message'), user)]

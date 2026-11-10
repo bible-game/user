@@ -1,5 +1,7 @@
 package game.bible.user
 
+import jakarta.persistence.LockModeType
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
@@ -16,6 +18,16 @@ import java.util.Optional
 interface UserRepository : JpaRepository<User, Long> {
 
     fun findByEmail(email: String): Optional<User>
+
+    fun findByClerkUserId(clerkUserId: String): Optional<User>
+
+    fun findByEmailIgnoreCase(email: String): Optional<User>
+
+    fun existsByEmailIgnoreCase(email: String): Boolean
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT u FROM User u WHERE u.id = :id")
+    fun findForClerkMigration(id: Long): Optional<User>
 
     @Modifying
     @Query("UPDATE User u SET u.password = :password, u.passwordChangedAt = :changedAt WHERE u.id = :id")
