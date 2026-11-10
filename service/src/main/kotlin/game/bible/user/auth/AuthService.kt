@@ -46,8 +46,11 @@ class AuthService(
      */
     @Transactional
     fun updatePassword(data: PasswordResetData) {
-        if (data.password.trim().length < MIN_PASSWORD_LENGTH) {
+        if (data.password.length < MIN_PASSWORD_LENGTH) {
             throw IllegalStateException("Password must be at least $MIN_PASSWORD_LENGTH characters long")
+        }
+        if (data.password.toByteArray(Charsets.UTF_8).size > 72) {
+            throw IllegalStateException("Password must be at most 72 UTF-8 bytes long")
         }
         val resetToken = validateToken(data.resetToken)
         log.debug("Handling password reset request for User ID: [{}]", resetToken.user.id!!)

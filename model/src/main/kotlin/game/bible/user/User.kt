@@ -1,5 +1,6 @@
 package game.bible.user
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonManagedReference
 import game.bible.common.model.BaseEntity
 import game.bible.user.state.game.Game
@@ -20,6 +21,7 @@ import java.sql.Timestamp
 @Table(name = "app_user")
 data class User(
     val email: String = "",
+    @get:JsonIgnore
     val password: String = "",
     val firstname: String = "",
     val lastname: String = "",

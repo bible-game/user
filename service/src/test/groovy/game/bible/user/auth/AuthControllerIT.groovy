@@ -121,7 +121,7 @@ class AuthControllerIT extends Specification {
 
     def "when a user requests to reset their password, then generate a new token and send an email"() {
         given: "We prepare a response for requests to the MockWebServer"
-        mockWebServer.enqueue(new MockResponse().setResponseCode(201).setBody("{}"))
+        mockWebServer.enqueue(new MockResponse().setResponseCode(201).setBody('{"Messages":[{"Status":"success"}]}'))
 
         when: "We request a password reset for our user"
         def response = mockMvc.perform(
@@ -141,14 +141,14 @@ class AuthControllerIT extends Specification {
         tokens.size() == 1
 
         and: "Verify that the MockWebServer got our request"
-        RecordedRequest received = mockWebServer.takeRequest()
+        RecordedRequest received = mockWebServer.takeRequest(5, java.util.concurrent.TimeUnit.SECONDS)
         Map<String, Object> body = mapper.readValue(received.getBody().readUtf8(), Map<String, Object>.class)
         Map<String, Object> sentMessage = (body["Messages"] as List)[0] as Map
 
         sentMessage["From"]["Email"] == "hello@bible.game"
         sentMessage["To"][0]["Email"] == user.email
         sentMessage["Subject"] == "Your password reset request for bible.game"
-        (sentMessage["HTMLPart"] as String).contains("reset?token=${tokens[0].token}")
+        sentMessage.Variables.resetLink == "http://localhost:3000/account/reset-password?token=${tokens[0].token}"
 
     }
 
@@ -181,7 +181,7 @@ class AuthControllerIT extends Specification {
         )
 
         and: "We prepare a response for requests to the MockWebServer"
-        mockWebServer.enqueue(new MockResponse().setResponseCode(201).setBody("{}"))
+        mockWebServer.enqueue(new MockResponse().setResponseCode(201).setBody('{"Messages":[{"Status":"success"}]}'))
 
         when: "We send a request a password reset for our user"
         def response = mockMvc.perform(
@@ -207,14 +207,14 @@ class AuthControllerIT extends Specification {
         oldTokenUpdated.state == ResetTokenState.REPLACED
 
         and: "Verify that the MockWebServer got our request"
-        RecordedRequest received = mockWebServer.takeRequest()
+        RecordedRequest received = mockWebServer.takeRequest(5, java.util.concurrent.TimeUnit.SECONDS)
         Map<String, Object> body = mapper.readValue(received.getBody().readUtf8(), Map<String, Object>.class)
         Map<String, Object> sentMessage = (body["Messages"] as List)[0] as Map
 
         sentMessage["From"]["Email"] == "hello@bible.game"
         sentMessage["To"][0]["Email"] == user.email
         sentMessage["Subject"] == "Your password reset request for bible.game"
-        (sentMessage["HTMLPart"] as String).contains("reset?token=${currentResetToken.token}")
+        sentMessage.Variables.resetLink == "http://localhost:3000/account/reset-password?token=${currentResetToken.token}"
     }
 
     def "when a user submits a new password, and they have an ACTIVE reset token, then the new password is applied"() {
@@ -237,7 +237,7 @@ class AuthControllerIT extends Specification {
         tx.commit()
 
         and: "We create a PasswordResetData object for our request"
-        def resetData = new PasswordResetData(resetToken.token, "N3wpass!")
+        def resetData = new PasswordResetData(resetToken.token, "N3wpass!!")
 
         when: "We submit a new password for our user"
         def response = mockMvc.perform(

@@ -1,6 +1,7 @@
 package game.bible.user.auth.registration
 
 import game.bible.user.User
+import org.springframework.dao.DuplicateKeyException
 import game.bible.user.UserRepository
 import game.bible.user.state.game.Game
 import game.bible.user.state.game.Guess
@@ -26,11 +27,12 @@ class RegistrationService(
     /** Performs user registration */
     @Transactional //@Throws(RegistrationException::class)
     fun register(data: RegistrationData): User {
-        val email = data.email // .normalise() -> TODO :: add to common utils (
+        val email = data.email
+        require(data.password.length >= 8) { "Password must be at least 8 characters long" }
+        require(data.password.toByteArray(Charsets.UTF_8).size <= 72) { "Password must be at most 72 UTF-8 bytes long" }
 
         if (isExisting(email)) {
-            throw Exception("registration.error.user-exists")
-            // TODO :: common app exception and message from service-level error bundle
+            throw DuplicateKeyException("This email is already registered.")
         }
 
         val password = passwordEncoder.encode(data.password)
