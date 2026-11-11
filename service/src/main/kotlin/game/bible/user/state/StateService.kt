@@ -68,6 +68,9 @@ class StateService(
         } else if (!game.playing) {
             return game.guesses
 
+        } else if (game.guesses.any { it.book == data.book && it.chapter == data.chapter }) {
+            return game.guesses
+
         } else {
             game.guesses.addLast(guess)
         }
