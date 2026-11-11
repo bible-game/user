@@ -108,11 +108,12 @@ class StateServiceSpec extends Specification implements StateTrait {
 
     def "should create guess for existing game"() {
         given:
+        def nextData = new GuessData('book', 'next-chapter', 1, 2, 'passage-book', 'passage-chapter')
         1 * gameRepo.findByPassageIdAndUserId(passageId, userId) >> Optional.of(game)
         1 * gameRepo.save(_) >> game
 
         when:
-        def result = service.createGuess(userId, passageId, guessData)
+        def result = service.createGuess(userId, passageId, nextData)
 
         then:
         result.size() == 2
@@ -123,7 +124,7 @@ class StateServiceSpec extends Specification implements StateTrait {
         given:
         def winningData = new GuessData(
             'book',
-            'chapter',
+            'winning-chapter',
             0,
             100,
             'passage-book',
@@ -155,15 +156,30 @@ class StateServiceSpec extends Specification implements StateTrait {
         )
 
         and:
+        def lastData = new GuessData('book', 'last-chapter', 1, 2, 'passage-book', 'passage-chapter')
         1 * gameRepo.findByPassageIdAndUserId(passageId, userId) >> Optional.of(game)
         1 * gameRepo.save(_) >> losingGame
+
+        when:
+        def result = service.createGuess(userId, passageId, lastData)
+
+        then:
+        result.size() == 5
+        noExceptionThrown()
+    }
+
+    def "should ignore a guess for a chapter already guessed"() {
+        given:
+        1 * gameRepo.findByPassageIdAndUserId(passageId, userId) >> Optional.of(game)
+        0 * gameRepo.save(_)
 
         when:
         def result = service.createGuess(userId, passageId, guessData)
 
         then:
-        result.size() == 5
-        noExceptionThrown()
+        result == [guess]
+        game.guesses.size() == 1
+        game.playing
     }
 
     def "should throw exception for inactive game"() {
