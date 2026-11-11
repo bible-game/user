@@ -63,10 +63,12 @@ passage-service:
 # Service Configuration :: User
 #########################################################################
 user-service:
+  reset-url: http://localhost:3000/account/reset-password
   comms:
     # MailJet
     base-url: http://localhost:56556
     send-address: hello@bible.game
+    template-id: 12345
     api-key: thisisanapikey
     secret-key: thisisasecretkey
 

@@ -1,35 +1,18 @@
 package game.bible.user.auth.registration
 
-import io.github.oshai.kotlinlogging.KotlinLogging
+import game.bible.common.util.security.TokenManager
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
-private val log = KotlinLogging.logger {}
-
-/**
- * Exposes Registration-related Actions
- * @since 5th June 2025
- */
 @RestController
 @RequestMapping("/auth/register")
-class RegistrationController(private val service: RegistrationService) {
-
-    /** Registers a new user */
+class RegistrationController(
+    private val service: RegistrationService,
+    private val tokenManager: TokenManager,
+) {
     @PostMapping
-    fun register(@RequestBody data: RegistrationData): ResponseEntity<Any> {
-        return try {
-            log.info { "Registration request received [${data.email}]" }
-
-            val response = service.register(data)
-            ResponseEntity.ok(response)
-
-        } catch (e: Exception) {
-            log.error { e.message } // TODO :: implement proper err handle
-            ResponseEntity.ok("Some error!")
-        }
+    fun register(@RequestBody data: RegistrationData): ResponseEntity<String> {
+        val user = service.register(data)
+        return ResponseEntity.status(201).body(tokenManager.generateFor(user.id!!))
     }
 }
-

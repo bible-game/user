@@ -27,6 +27,8 @@ class NotificationServiceSpec extends Specification {
         ReflectionTestUtils.setField(comms, "secretKey", "shhhhhh")
 
         ReflectionTestUtils.setField(userConfig, "comms", comms)
+        ReflectionTestUtils.setField(userConfig, "resetUrl", "https://bible.game/account/reset-password")
+        ReflectionTestUtils.setField(comms, "templateId", 12345L)
 
         EmailClient emailClient = new EmailClient(userConfig)
         notificationService = new NotificationService(emailClient)

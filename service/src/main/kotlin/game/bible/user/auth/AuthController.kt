@@ -50,7 +50,7 @@ class AuthController(
             ResponseEntity.internalServerError().body(
                 mapOf(
                     "type" to "INTERNAL_SERVER_ERROR",
-                    "message" to "Internal Server Error. Please check the logs for detail."
+                    "message" to "An unexpected error occurred. Please try again later."
                 )
             )
         }
@@ -70,7 +70,7 @@ class AuthController(
                 ResponseEntity.ok().build()
             } catch (e: Exception) {
                 log.error("Error occurred when sending reset request email!", e)
-                ResponseEntity.internalServerError().body("An unexpected error occurred. Please review the service logs.")
+                ResponseEntity.internalServerError().body("An unexpected error occurred. Please try again later.")
             }
         }
     }
